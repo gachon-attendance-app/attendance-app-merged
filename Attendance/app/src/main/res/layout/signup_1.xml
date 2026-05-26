@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/signupRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical">
+
+    <!-- 상단 빈 상태바 느낌 영역 -->
+    <View
+        android:id="@+id/statusArea"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:background="#FFFFFF" />
+
+    <!-- 상단 파란 헤더 -->
+    <FrameLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:background="@color/primarybase">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="7dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="뒤로가기"
+            android:padding="14dp"
+            android:src="@drawable/arrow"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/tvSignupTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:fontFamily="@font/pretendard_bold"
+            android:gravity="center"
+            android:text="회원 구분"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
+
+    <!-- 메인 영역 -->
+    <LinearLayout
+        android:id="@+id/contentArea"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="top|center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvSelectUserType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="88dp"
+            android:fontFamily="@font/pretendard_bold"
+            android:gravity="center"
+            android:text="회원 유형을 선택해 주세요"
+            android:textColor="@color/primarybase"
+            android:textSize="23sp"
+            android:textStyle="bold" />
+
+        <!-- 학생 / 교수 선택 버튼 영역 -->
+        <LinearLayout
+            android:id="@+id/userTypeButtonArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="91dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- 왼쪽 버튼: 학생 페이지로 이동 예정 -->
+            <ImageButton
+                android:id="@+id/btnStudent"
+                android:layout_width="112dp"
+                android:layout_height="139dp"
+                android:background="@drawable/bg_signup_type_button"
+                android:contentDescription="학생 선택"
+                android:padding="32dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/professor"
+                android:tint="#BDBDBD" />
+
+            <Space
+                android:layout_width="33dp"
+                android:layout_height="1dp" />
+
+            <!-- 오른쪽 버튼: 교수 페이지로 이동 예정 -->
+            <ImageButton
+                android:id="@+id/btnProfessor"
+                android:layout_width="112dp"
+                android:layout_height="139dp"
+                android:background="@drawable/bg_signup_type_button"
+                android:contentDescription="교수 선택"
+                android:padding="32dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/student"
+                android:tint="#BDBDBD" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- 하단 로고 영역 -->
+    <LinearLayout
+        android:id="@+id/bottomLogoArea"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#E9EAEC"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="27dp">
+
+        <ImageView
+            android:id="@+id/ivBottomLogo"
+            android:layout_width="122dp"
+            android:layout_height="44dp"
+            android:contentDescription="가천대학교 로고"
+            android:scaleType="fitStart"
+            android:src="@drawable/nulogo" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:gravity="start"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <!-- 로고 -->
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="96dp"
+        android:contentDescription="로고"
+        android:src="@drawable/logo" />
+
+    <!-- 타이틀 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="가천대학교 전자출결"
+        android:textColor="#014E98"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <!-- 서브타이틀 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="가천 포털 아이디, 비밀번호를 입력하세요."
+        android:textColor="#4D4E53"
+        android:textSize="15sp" />
+
+    <!-- 아이디 입력 -->
+    <EditText
+        android:id="@+id/etId"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="41dp"
+        android:background="@drawable/bg_edittext"
+        android:fontFamily="@font/pretendard_regular"
+        android:hint="가천 포털 아이디"
+        android:inputType="text"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textSize="14sp" />
+
+    <!-- 아이디 오류 문구 -->
+    <TextView
+        android:id="@+id/tvIdError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="입력하신 아이디를 찾을 수 없습니다"
+        android:textColor="#FF0000"
+        android:textSize="11sp"
+        android:visibility="gone" />
+
+    <!-- 비밀번호 입력 -->
+    <EditText
+        android:id="@+id/etPw"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_edittext"
+        android:fontFamily="@font/pretendard_regular"
+        android:hint="가천 포털 비밀번호"
+        android:inputType="textPassword"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textSize="14sp" />
+
+    <!-- 비밀번호 오류 문구 -->
+    <TextView
+        android:id="@+id/tvPwError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="비밀번호가 올바르지 않습니다"
+        android:textColor="#FF0000"
+        android:textSize="11sp"
+        android:visibility="gone" />
+
+    <!-- 자동 로그인 -->
+    <CheckBox
+        android:id="@+id/cbAutoLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="자동 로그인"
+        android:textColor="#555555"
+        android:textSize="13sp" />
+
+    <!-- 로그인 버튼 -->
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="43dp"
+        android:background="@drawable/bg_button_blue"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="로그인 하기"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+    <!-- 회원가입 링크 -->
+    <TextView
+        android:id="@+id/tvSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="회원가입 하기"
+        android:color="@color/grey700"
+        android:textSize="15sp" />
+
+</LinearLayout>

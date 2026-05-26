@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/signup2Root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical">
+
+    <!-- 상단 빈 상태바 느낌 영역 -->
+    <View
+        android:id="@+id/statusArea"
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:background="#FFFFFF" />
+
+    <!-- 상단 파란 헤더 -->
+    <FrameLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="41dp"
+        android:background="@color/primarybase">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="4dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="뒤로가기"
+            android:padding="14dp"
+            android:src="@drawable/arrow"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/tvTopTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:fontFamily="@font/pretendard_bold"
+            android:gravity="center"
+            android:text="회원 가입"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
+
+    <!-- 메인 콘텐츠 -->
+    <LinearLayout
+        android:id="@+id/contentArea"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="33dp"
+        android:paddingEnd="33dp">
+
+        <TextView
+            android:id="@+id/tvSignupTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="57dp"
+            android:fontFamily="@font/pretendard_bold"
+            android:text="회원가입"
+            android:textColor="@color/primarybase"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSignupDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            android:fontFamily="@font/pretendard_regular"
+            android:text="가천 포털 아이디, 비밀번호, 이메일을 입력하세요."
+            android:textColor="#555555"
+            android:textSize="12sp" />
+
+        <!-- 아이디 입력 -->
+        <EditText
+            android:id="@+id/etPortalId"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="36dp"
+            android:background="@drawable/bg_signup_input"
+            android:fontFamily="@font/pretendard_regular"
+            android:hint="가천 포털 아이디"
+            android:inputType="text"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:singleLine="true"
+            android:textColor="#222222"
+            android:textColorHint="#9C9C9C"
+            android:textSize="16sp" />
+
+        <!-- 비밀번호 입력 -->
+        <FrameLayout
+            android:id="@+id/passwordBox"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_signup_input">
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/pretendard_regular"
+                android:hint="가천 포털 비밀번호"
+                android:inputType="textPassword"
+                android:paddingStart="16dp"
+                android:paddingEnd="48dp"
+                android:singleLine="true"
+                android:textColor="#222222"
+                android:textColorHint="#9C9C9C"
+                android:textSize="16sp" />
+
+            <ImageButton
+                android:id="@+id/btnPasswordVisible"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end|center_vertical"
+                android:background="@android:color/transparent"
+                android:contentDescription="비밀번호 보기"
+                android:padding="12dp"
+                android:src="@drawable/eye"
+                android:tint="#777777" />
+
+        </FrameLayout>
+
+        <!-- 비밀번호 에러 문구: 기본은 숨김 -->
+        <TextView
+            android:id="@+id/tvPasswordError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/pretendard_regular"
+            android:text="영문, 숫자, 특수문자를 혼합하여 8~16자 이내로 입력해 주세요"
+            android:textColor="#FF3333"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <!-- 비밀번호 확인 입력 -->
+        <FrameLayout
+            android:id="@+id/passwordCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_signup_input">
+
+            <EditText
+                android:id="@+id/etPasswordCheck"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:fontFamily="@font/pretendard_regular"
+                android:hint="비밀번호 재확인"
+                android:inputType="textPassword"
+                android:paddingStart="16dp"
+                android:paddingEnd="48dp"
+                android:singleLine="true"
+                android:textColor="#222222"
+                android:textColorHint="#9C9C9C"
+                android:textSize="16sp" />
+
+            <ImageButton
+                android:id="@+id/btnPasswordCheckVisible"
+                android:layout_width="44dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="end|center_vertical"
+                android:background="@android:color/transparent"
+                android:contentDescription="비밀번호 확인 보기"
+                android:padding="12dp"
+                android:src="@drawable/eye"
+                android:tint="#777777" />
+
+        </FrameLayout>
+
+        <!-- 비밀번호 확인 에러 문구: 기본은 숨김 -->
+        <TextView
+            android:id="@+id/tvPasswordCheckError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/pretendard_regular"
+            android:text="동일한 비밀번호를 입력해 주세요"
+            android:textColor="#FF3333"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <!-- 이메일 입력 -->
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_signup_input"
+            android:fontFamily="@font/pretendard_regular"
+            android:hint="가천 포털 이메일"
+            android:inputType="textEmailAddress"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:singleLine="true"
+            android:textColor="#222222"
+            android:textColorHint="#9C9C9C"
+            android:textSize="16sp" />
+
+        <!-- 이용약관 체크 영역 -->
+        <LinearLayout
+            android:id="@+id/termsArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="17dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/checkTerms"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:buttonTint="#222222"
+                android:checked="false"
+                android:padding="0dp" />
+
+            <TextView
+                android:id="@+id/tvTermsPrefix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="이용 약관"
+                android:textColor="#222222"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvTermsSuffix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_regular"
+                android:text="을 확인했으며, 동의합니다."
+                android:textColor="#222222"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- 회원가입 버튼: 기본은 비활성화 -->
+        <Button
+            android:id="@+id/btnSignup"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/bg_signup_button_selector"
+            android:enabled="false"
+            android:fontFamily="@font/pretendard_bold"
+            android:text="회원가입하기"
+            android:textColor="@drawable/text_signup_button_selector"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- 하단 로고 영역 -->
+    <LinearLayout
+        android:id="@+id/bottomLogoArea"
+        android:layout_width="match_parent"
+        android:layout_height="74dp"
+        android:background="#E9EAEC"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="23dp">
+
+        <ImageView
+            android:id="@+id/ivBottomLogo"
+            android:layout_width="122dp"
+            android:layout_height="44dp"
+            android:contentDescription="가천대학교 로고"
+            android:scaleType="fitStart"
+            android:src="@drawable/nulogo" />
+
+    </LinearLayout>
+
+</LinearLayout>

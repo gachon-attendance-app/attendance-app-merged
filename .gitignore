@@ -1,0 +1,34 @@
+# ── Android ──
+Attendance/.gradle/
+Attendance/build/
+Attendance/app/build/
+Attendance/captures/
+Attendance/local.properties
+Attendance/.idea/
+Attendance/*.iml
+Attendance/app/*.iml
+
+# ── Node.js (attendance-server) ──
+attendance-server/node_modules/
+attendance-server/.env
+attendance-server/.env.local
+attendance-server/npm-debug.log*
+attendance-server/yarn-debug.log*
+attendance-server/yarn-error.log*
+
+# ── JVM / OS / IDE ──
+hs_err_pid*.log
+replay_pid*.log
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Secrets ──
+# Admin SDK 키 (admin 권한 유출 방지 — 절대 commit X)
+**/serviceAccountKey.json
+**/*-firebase-adminsdk-*.json
+**/firebase-adminsdk-*.json
+# google-services.json은 client config라 commit OK (Google 공식).
+# 진짜 보안은 Firebase Security Rules + Google Cloud API key restrictions로.
+# 팀원 협업 편의 위해 의도적으로 추적함.

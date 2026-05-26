@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Default -->
+    <color name="purple80">#D0BCFF</color>
+    <color name="purplegrey80">#CCC2DC</color>
+    <color name="pink80">#EFB8C8</color>
+
+    <color name="purple40">#6650A4</color>
+    <color name="purplegrey40">#625B71</color>
+    <color name="pink40">#7D5260</color>
+
+    <!-- Primary -->
+    <color name="primarybase">#014E98</color>
+    <color name="primary100">#DAE4FF</color>
+    <color name="primary200">#9EBCFF</color>
+    <color name="primary300">#4F95FF</color>
+    <color name="primary400">#0270D6</color>
+    <color name="primary500">#014E98</color>
+    <color name="primary600">#002E5E</color>
+    <color name="primary700">#001129</color>
+
+    <!-- Secondary -->
+    <color name="secondarybase">#013E7A</color>
+    <color name="secondary100">#ECF1FF</color>
+    <color name="secondary200">#BDD0FF</color>
+    <color name="secondary300">#7BA9FF</color>
+    <color name="secondary400">#0583F5</color>
+    <color name="secondary500">#025FB6</color>
+    <color name="secondary600">#013E7A</color>
+    <color name="secondary700">#001F43</color>
+
+    <!-- Teriary -->
+    <color name="teriarybase">#015EB6</color>
+    <color name="teriary100">#ECF1FF</color>
+    <color name="teriary200">#BCCFFF</color>
+    <color name="teriary300">#7AA7FF</color>
+    <color name="teriary400">#0281F6</color>
+    <color name="teriary500">#015EB6</color>
+    <color name="teriary600">#003D7A</color>
+    <color name="teriary700">#001F43</color>
+
+    <!-- Grey -->
+    <color name="greybase">#4D4E53</color>
+    <color name="grey100">#E3E3E5</color>
+    <color name="grey200">#BBBBBF</color>
+    <color name="grey300">#94959B</color>
+    <color name="grey400">#6F7177</color>
+    <color name="grey500">#4D4E53</color>
+    <color name="grey600">#2D2E31</color>
+    <color name="grey700">#101112</color>
+
+</resources>

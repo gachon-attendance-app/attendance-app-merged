@@ -1,0 +1,984 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/officialAbsenceRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EFEFEF"
+    android:orientation="vertical">
+
+    <!-- 상단 영역 -->
+    <LinearLayout
+        android:id="@+id/topHeader"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:gravity="bottom|center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="24dp">
+
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="122dp"
+            android:layout_height="44dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/nulogo" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@android:color/transparent"
+            android:padding="8dp"
+            android:src="@drawable/menu"
+            android:tint="#555555" />
+    </LinearLayout>
+
+    <!-- 메인 콘텐츠 -->
+    <LinearLayout
+        android:id="@+id/contentArea"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp">
+
+        <!-- 제목 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/titleCard"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
+
+            <TextView
+                android:id="@+id/tvOfficialAbsenceTitle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/pretendard_bold"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:text="유고 결석"
+                android:textColor="#111111"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- 중앙 큰 흰색 박스 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/officialAbsenceMainCard"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
+
+            <ScrollView
+                android:id="@+id/officialAbsenceScroll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:overScrollMode="never">
+
+                <LinearLayout
+                    android:id="@+id/officialAbsenceContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="14dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="24dp">
+
+                    <!-- 페이지 내부 타이틀 -->
+                    <TextView
+                        android:id="@+id/tvPageTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:text="유고결석 안내"
+                        android:textColor="#111111"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvPageSubTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="출석 인정이 필요한 경우 사유 발생 후 정해진 기간 내에 증빙서류를 준비하여 제출해야 합니다."
+                        android:textColor="#555555"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="3dp" />
+
+                    <!-- 안내 박스 -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/noticeCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:cardBackgroundColor="#F2F5FA"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:id="@+id/noticeArea"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <TextView
+                                android:id="@+id/tvNoticeTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:text="제출 및 처리 안내"
+                                android:textColor="@color/primarybase"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvNoticeContent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="유고결석을 인정받으려면 사유 발생 후 7일 이내에 유고결석계와 증빙서류를 준비하여 학과장 날인 후 단과대학 행정실을 거쳐 학생지원팀에 제출해야 합니다."
+                                android:textColor="#222222"
+                                android:textSize="14sp"
+                                android:lineSpacingExtra="4dp" />
+
+                            <TextView
+                                android:id="@+id/tvNoticeRoute"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="제출 절차 : 지도교수 → 학과사무실 → 단과대학 행정실 → 학생서비스센터"
+                                android:textColor="#333333"
+                                android:textSize="13sp"
+                                android:lineSpacingExtra="3dp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- 다운로드/공유 버튼 영역 -->
+                    <LinearLayout
+                        android:id="@+id/fileActionArea"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvFileSectionTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_bold"
+                            android:text="필요 서류"
+                            android:textColor="#111111"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <!-- 유고결석계 다운로드 카드 -->
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/officialAbsencePdfCard"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardCornerRadius="8dp"
+                            app:cardElevation="0dp"
+                            app:cardUseCompatPadding="false">
+
+                            <LinearLayout
+                                android:id="@+id/officialAbsencePdfArea"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="#FAFAFA"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="12dp"
+                                android:paddingTop="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingBottom="12dp">
+
+                                <TextView
+                                    android:id="@+id/tvOfficialAbsencePdfIcon"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="@color/primarybase"
+                                    android:gravity="center"
+                                    android:text="PDF"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvOfficialAbsencePdfName"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/pretendard_bold"
+                                        android:text="유고결석계(출석인정원)"
+                                        android:textColor="#111111"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvOfficialAbsencePdfDesc"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="3dp"
+                                        android:text="출석 인정을 신청할 때 사용하는 양식"
+                                        android:textColor="#777777"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/btnDownloadOfficialAbsencePdf"
+                                    android:layout_width="66dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_outline_primary"
+                                    android:gravity="center"
+                                    android:text="다운로드"
+                                    android:textColor="@color/primarybase"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnShareOfficialAbsencePdf"
+                                    android:layout_width="50dp"
+                                    android:layout_height="36dp"
+                                    android:layout_marginStart="6dp"
+                                    android:background="@drawable/bg_primary_round"
+                                    android:gravity="center"
+                                    android:text="공유"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- 성적인정원 다운로드 카드 -->
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/gradeRecognitionPdfCard"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardCornerRadius="8dp"
+                            app:cardElevation="0dp"
+                            app:cardUseCompatPadding="false">
+
+                            <LinearLayout
+                                android:id="@+id/gradeRecognitionPdfArea"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="#FAFAFA"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingStart="12dp"
+                                android:paddingTop="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingBottom="12dp">
+
+                                <TextView
+                                    android:id="@+id/tvGradeRecognitionPdfIcon"
+                                    android:layout_width="38dp"
+                                    android:layout_height="38dp"
+                                    android:background="#6B7A90"
+                                    android:gravity="center"
+                                    android:text="PDF"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="12dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvGradeRecognitionPdfName"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/pretendard_bold"
+                                        android:text="성적인정원"
+                                        android:textColor="#111111"
+                                        android:textSize="15sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvGradeRecognitionPdfDesc"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="3dp"
+                                        android:text="시험 미응시로 성적 인정이 필요한 경우 사용하는 양식"
+                                        android:textColor="#777777"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/btnDownloadGradeRecognitionPdf"
+                                    android:layout_width="66dp"
+                                    android:layout_height="36dp"
+                                    android:background="@drawable/bg_outline_primary"
+                                    android:gravity="center"
+                                    android:text="다운로드"
+                                    android:textColor="@color/primarybase"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/btnShareGradeRecognitionPdf"
+                                    android:layout_width="50dp"
+                                    android:layout_height="36dp"
+                                    android:layout_marginStart="6dp"
+                                    android:background="@drawable/bg_primary_round"
+                                    android:gravity="center"
+                                    android:text="공유"
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+                    <!-- 유고결석 인정 -->
+                    <TextView
+                        android:id="@+id/tvAbsenceRecognitionTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="22dp"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:text="유고결석의 인정"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvAbsenceRecognitionContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="유고결석을 인정받으려면 사유 발생 후 7일 이내에 유고결석계에 증빙서류를 첨부하여 학과장 날인 후 단과대학 행정실을 거쳐 학생지원팀에 제출하여야 합니다."
+                        android:textColor="#333333"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp" />
+
+                    <!-- 성적의 처리 -->
+                    <TextView
+                        android:id="@+id/tvGradeProcessTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="22dp"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:text="성적의 처리"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvGradeProcessContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="유고결석으로 인하여 중간시험 또는 기말시험 중 어느 하나에 응하지 못한 경우에는 성적인정원을 제출하고 응시한 시험만으로 성적평가를 받을 수 있습니다. 둘 모두 응시하지 못하거나 당해학기 1회만 실시한 시험에 응하지 못한 경우에는 추가시험에 응한 때에만 성적평가를 받을 수 있습니다."
+                        android:textColor="#333333"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp" />
+
+                    <!-- 표 타이틀 -->
+                    <TextView
+                        android:id="@+id/tvReasonTableTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:text="유고결석 사유, 결석허용기간 및 증빙서류"
+                        android:textColor="#111111"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <!-- 표 헤더 -->
+                    <LinearLayout
+                        android:id="@+id/tableHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:layout_marginTop="10dp"
+                        android:background="#F2F5FA"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center"
+                            android:text="유고결석 사유"
+                            android:textColor="#111111"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#D6D6D6" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:text="허용기간"
+                            android:textColor="#111111"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#D6D6D6" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center"
+                            android:text="증빙서류"
+                            android:textColor="#111111"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- 1. 직계존비속 사망 -->
+                    <LinearLayout
+                        android:id="@+id/reasonRowDeath"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="82dp"
+                        android:orientation="horizontal"
+                        android:background="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tvReasonDeath"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="1. 직계존비속의 사망\n※ 인정되는 관계 : 조부모, 부모, 처, 자, 형, 동생, 외조부모"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvPeriodDeath"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:padding="6dp"
+                            android:text="7일 이내"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvDocumentDeath"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="사망자의 기본증명서,\n가족관계증명서"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- 2. 본인의 결혼 -->
+                    <LinearLayout
+                        android:id="@+id/reasonRowMarriage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="62dp"
+                        android:orientation="horizontal"
+                        android:background="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tvReasonMarriage"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="2. 본인의 결혼"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvPeriodMarriage"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:padding="6dp"
+                            android:text="5일 이내"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvDocumentMarriage"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="결혼을 증빙하는 서류"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- 3. 병무소집 또는 질병검사 -->
+                    <LinearLayout
+                        android:id="@+id/reasonRowMilitary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="62dp"
+                        android:orientation="horizontal"
+                        android:background="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tvReasonMilitary"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="3. 단기 병무소집 또는 징병검사"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvPeriodMilitary"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:padding="6dp"
+                            android:text="소요기간"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvDocumentMilitary"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="소집영장 또는 징병검사통지서"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- 4. 불가항력 -->
+                    <LinearLayout
+                        android:id="@+id/reasonRowDisaster"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="72dp"
+                        android:orientation="horizontal"
+                        android:background="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tvReasonDisaster"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="4. 불가항력의 사유\n천재·지변·수재·화재에 한함"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvPeriodDisaster"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:padding="6dp"
+                            android:text="불가항력의 복구기간"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvDocumentDisaster"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="필요한 증빙서류"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- 5. 본대학교를 대표하는 공무/경기 -->
+                    <LinearLayout
+                        android:id="@+id/reasonRowOfficial"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="158dp"
+                        android:orientation="horizontal"
+                        android:background="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tvReasonOfficial"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="5. 본대학교를 대표하는 공무·경기\n• 개교기념 체육대회\n• 총학생회 주최 행사\n• 총학생회 회의\n• 연구발표회\n• 방송실습업무\n• 학보기사 작성·편집\n• 졸업준비\n• 총장이 인정하는 과외활동"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvPeriodOfficial"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:padding="6dp"
+                            android:text="전후 10일 이내\n당일\n당일\n전후 10일 이내\n당일\n당일\n전후 10일 이내\n소요일"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="4dp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvDocumentOfficial"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="필요한 증빙서류\n확인서 등"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- 6. 출산 -->
+                    <LinearLayout
+                        android:id="@+id/reasonRowBirth"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="72dp"
+                        android:orientation="horizontal"
+                        android:background="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tvReasonBirth"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="6. 출산\n• 본인의 출산\n• 배우자의 출산"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvPeriodBirth"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:padding="6dp"
+                            android:text="20일 이내\n10일 이내"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="4dp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvDocumentBirth"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="출생증명서 및 가족관계증명서류"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- 7. 전염성 질병 -->
+                    <LinearLayout
+                        android:id="@+id/reasonRowDisease"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="72dp"
+                        android:orientation="horizontal"
+                        android:background="#FFFFFF">
+
+                        <TextView
+                            android:id="@+id/tvReasonDisease"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="7. 의사 소견상 등교가 불가능한 전염성 질병"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvPeriodDisease"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="0.8"
+                            android:gravity="center"
+                            android:padding="6dp"
+                            android:text="7일 이내"
+                            android:textColor="#333333"
+                            android:textSize="12sp" />
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#E0E0E0" />
+
+                        <TextView
+                            android:id="@+id/tvDocumentDisease"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.2"
+                            android:gravity="center_vertical"
+                            android:padding="8dp"
+                            android:text="진단서 또는 견서\n단, 수업 방식에 따라 유연하게 운영"
+                            android:textColor="#333333"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="3dp" />
+                    </LinearLayout>
+
+                    <!-- 백엔드 / Kotlin 연결용 숨김 TextView -->
+                    <TextView
+                        android:id="@+id/tvOfficialAbsencePdfUrl"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:text=""
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvGradeRecognitionPdfUrl"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:text=""
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvStudentId"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:text=""
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvStudentName"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:text=""
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvDepartmentName"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:text=""
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </ScrollView>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- 하단 메뉴 -->
+    <LinearLayout
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@color/primarybase"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnBottomHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/home"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomRefresh"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/retry"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomNotice"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/bell"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomSchedule"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/calendar"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomLogout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/back"
+            android:tint="#FFFFFF" />
+    </LinearLayout>
+
+</LinearLayout>

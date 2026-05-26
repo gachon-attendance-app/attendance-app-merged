@@ -1,0 +1,496 @@
+{
+  "Absence_Requests": {
+    "14454001": {
+      "2026-05-18": {
+        "202234920": {
+          "absenceType": "생리 공결",
+          "content": "생리로 인한 결석신청합니다.",
+          "status": "PENDING",
+          "timestamp": 111111111
+        }
+      }
+    }
+  },
+  "Attendance_Records": {
+    "14454001": {
+      "2026-04-28": {
+        "202234920": {
+          "finalStatus": "출석",
+          "missedCount": 0
+        }
+      }
+    },
+    "TEST_SUBJECT": {
+      "2026-05-26": {
+        "TEST_STUDENT_01": {
+          "finalStatus": "ABSENT",
+          "missedCount": 3
+        }
+      }
+    }
+  },
+  "Attendance_Session": {
+    "14454001": {
+      "2026-04-28": {
+        "authMethod": "BLUETOOTH",
+        "pinCode": 1234,
+        "pinExpiresAt": "2026-05-19T09:15:00",
+        "sessionId": 100,
+        "startedAt": "2026-05-19T09:00:00",
+        "status": "READY",
+        "success": true
+      },
+      "2026-05-13": {
+        "authMethod": "BLUETOOTH",
+        "pinCode": 1238,
+        "status": "READY"
+      }
+    }
+  },
+  "Class_Notices": {
+    "14454001": {
+      "notic_11111111": {
+        "content": "출장으로 인해 5/25(월) 수업은 휴강합니다. 보강은 MOOC으로 진행합니다.",
+        "targetDate": "2026-05-25",
+        "timestamp": 111111111111,
+        "title": "5/25(월) 휴강 안내",
+        "type": "CANCELED"
+      }
+    }
+  },
+  "Enrollment": {
+    "202234920": {
+      "14454001": true
+    }
+  },
+  "Subjects": {
+    "10177001": {
+      "professorName": "황현호",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Friday",
+          "location": "화상강의강의실(가상)",
+          "periods": [
+            null,
+            {
+              "endTime": "10:50",
+              "startTime": "10:00"
+            },
+            {
+              "endTime": "11:50",
+              "startTime": "11:00"
+            },
+            {
+              "endTime": "12:50",
+              "startTime": "12:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "10177001",
+      "subjectName": "소프트웨어공학 (실시간화상강의)"
+    },
+    "13966001": {
+      "professorName": "최재혁",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Monday",
+          "location": "AI관-412",
+          "periods": [
+            null,
+            {
+              "endTime": "10:50",
+              "startTime": "10:00"
+            },
+            {
+              "endTime": "11:50",
+              "startTime": "11:00"
+            }
+          ]
+        },
+        "day2": {
+          "dayOfWeek": "Wednesday",
+          "location": "AI관-413",
+          "periods": [
+            null,
+            {
+              "endTime": "14:50",
+              "startTime": "14:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "13966001",
+      "subjectName": "사물인터넷개론 (영어강의)"
+    },
+    "13966002": {
+      "professorName": "최재혁",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Monday",
+          "location": "AI관-412",
+          "periods": [
+            null,
+            {
+              "endTime": "13:50",
+              "startTime": "13:00"
+            },
+            {
+              "endTime": "14:50",
+              "startTime": "14:00"
+            }
+          ]
+        },
+        "day2": {
+          "dayOfWeek": "Wednesday",
+          "location": "AI관-413",
+          "periods": [
+            null,
+            {
+              "endTime": "15:50",
+              "startTime": "15:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "13966002",
+      "subjectName": "사물인터넷개론 (영어강의)"
+    },
+    "14454001": {
+      "professorName": "민홍",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Tuesday",
+          "location": "AI관-301",
+          "periods": [
+            null,
+            {
+              "endTime": "14:50",
+              "startTime": "14:00"
+            }
+          ]
+        },
+        "day2": {
+          "dayOfWeek": "Thursday",
+          "location": "AI관-301",
+          "periods": [
+            null,
+            {
+              "endTime": "13:50",
+              "startTime": "13:00"
+            },
+            {
+              "endTime": "14:50",
+              "startTime": "14:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "14454001",
+      "subjectName": "모바일프로그래밍 (영어강의)"
+    },
+    "14454002": {
+      "professorName": "민홍",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Tuesday",
+          "location": "AI관-301",
+          "periods": [
+            null,
+            {
+              "endTime": "15:50",
+              "startTime": "15:00"
+            }
+          ]
+        },
+        "day2": {
+          "dayOfWeek": "Thursday",
+          "location": "AI관-301",
+          "periods": [
+            null,
+            {
+              "endTime": "15:50",
+              "startTime": "15:00"
+            },
+            {
+              "endTime": "16:50",
+              "startTime": "16:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "14454002",
+      "subjectName": "모바일프로그래밍 (영어강의)"
+    },
+    "14455001": {
+      "professorName": "정옥란",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Tuesday",
+          "location": "AI관-411",
+          "periods": [
+            null,
+            {
+              "endTime": "11:50",
+              "startTime": "11:00"
+            },
+            {
+              "endTime": "12:50",
+              "startTime": "12:00"
+            }
+          ]
+        },
+        "day2": {
+          "dayOfWeek": "Thursday",
+          "location": "AI관-413",
+          "periods": [
+            null,
+            {
+              "endTime": "11:50",
+              "startTime": "11:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "14455001",
+      "subjectName": "데이터과학 (영어강의)"
+    },
+    "14455005": {
+      "professorName": "조풍진",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Wednesday",
+          "location": "AI관-411",
+          "periods": [
+            null,
+            {
+              "endTime": "10:50",
+              "startTime": "10:00"
+            },
+            {
+              "endTime": "11:50",
+              "startTime": "11:00"
+            }
+          ]
+        },
+        "day2": {
+          "dayOfWeek": "Thursday",
+          "location": "AI관-511",
+          "periods": [
+            null,
+            {
+              "endTime": "12:50",
+              "startTime": "12:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "14455005",
+      "subjectName": "데이터과학 (영어강의)"
+    },
+    "14455006": {
+      "professorName": "노웅기",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Tuesday",
+          "location": "AI관-412",
+          "periods": [
+            null,
+            {
+              "endTime": "09:50",
+              "startTime": "09:00"
+            },
+            {
+              "endTime": "10:50",
+              "startTime": "10:00"
+            }
+          ]
+        },
+        "day2": {
+          "dayOfWeek": "Wednesday",
+          "location": "AI관-413",
+          "periods": [
+            null,
+            {
+              "endTime": "11:50",
+              "startTime": "11:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "14455006",
+      "subjectName": "데이터과학 (영어강의)"
+    },
+    "14570002": {
+      "professorName": "김현구",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Monday",
+          "location": "화상강의강의실(가상)",
+          "periods": [
+            null,
+            {
+              "endTime": "15:50",
+              "startTime": "15:00"
+            },
+            {
+              "endTime": "16:50",
+              "startTime": "16:00"
+            },
+            {
+              "endTime": "17:50",
+              "startTime": "17:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "14570002",
+      "subjectName": "디지털마케팅 (실시간화상강의)"
+    },
+    "14856001": {
+      "professorName": "MEHMOOD ASIF",
+      "schedule": {
+        "day1": {
+          "dayOfWeek": "Tuesday",
+          "location": "AI관-414",
+          "periods": [
+            null,
+            {
+              "endTime": "15:50",
+              "startTime": "15:00"
+            },
+            {
+              "endTime": "16:50",
+              "startTime": "16:00"
+            },
+            {
+              "endTime": "17:50",
+              "startTime": "17:00"
+            }
+          ]
+        }
+      },
+      "subjectCode": "14856001",
+      "subjectName": "고급웹프로그래밍 (영어강의)"
+    }
+  },
+  "UWB_Logs": {
+    "14454001": {
+      "2026-04-28": {
+        "202234920": {
+          "14_05": {
+            "isDetected": true,
+            "timestamp": "14:05:00"
+          }
+        }
+      }
+    },
+    "TEST_SUBJECT": {
+      "2026-05-26": {
+        "TEST_STUDENT_01": {
+          "06:24": {
+            "detected": false,
+            "timestamp": "1779776687819"
+          },
+          "06:25": {
+            "detected": false,
+            "timestamp": "1779776747888"
+          },
+          "06:26": {
+            "detected": false,
+            "timestamp": "1779776807951"
+          }
+        }
+      }
+    },
+    "TEST_SUB_101": {
+      "2026-05-26": {
+        "TEST_STUDENT_999": {
+          "06:25": {
+            "detected": false,
+            "timestamp": "1779776749619"
+          }
+        }
+      }
+    }
+  },
+  "Users": {
+    "202234920": {
+      "name": "이원희",
+      "password": 1111,
+      "portalID": "gachon1",
+      "userId": "202234920",
+      "userType": "STUDENT"
+    },
+    "202234922": {
+      "name": "testStudent2",
+      "password": 1112,
+      "portalID": "gachon2",
+      "userId": "202234922",
+      "userType": "STUDENT"
+    },
+    "202234923": {
+      "name": "testStudent3",
+      "password": 1113,
+      "portalID": "gachon3",
+      "userId": "202234923",
+      "userType": "STUDENT"
+    },
+    "202234924": {
+      "name": "testStudent4",
+      "password": 1114,
+      "portalID": "gachon4",
+      "userId": "202234924",
+      "userType": "STUDENT"
+    },
+    "202234925": {
+      "name": "testStudent5",
+      "password": 1115,
+      "portalID": "gachon5",
+      "userId": "202234925",
+      "userType": "STUDENT"
+    },
+    "202234926": {
+      "name": "testStudent6",
+      "password": 1116,
+      "portalID": "gachon6",
+      "userId": "202234926",
+      "userType": "STUDENT"
+    },
+    "202234927": {
+      "name": "testStudent7",
+      "password": 1117,
+      "portalID": "gachon7",
+      "userId": "202234927",
+      "userType": "STUDENT"
+    },
+    "202234928": {
+      "name": "testStudent8",
+      "password": 1118,
+      "portalID": "gachon8",
+      "userId": "202234928",
+      "userType": "STUDENT"
+    },
+    "202234929": {
+      "name": "testStudent9",
+      "password": 1119,
+      "portalID": "gachon9",
+      "userId": "202234929",
+      "userType": "STUDENT"
+    },
+    "202234930": {
+      "name": "testStudent10",
+      "password": 1120,
+      "portalID": "gachon10",
+      "userId": "202234930",
+      "userType": "STUDENT"
+    },
+    "testUser": {
+      "name": "민홍",
+      "password": 1234,
+      "portalID": "professor1",
+      "userId": "testUser",
+      "userType": "PROFESSOR"
+    }
+  }
+}

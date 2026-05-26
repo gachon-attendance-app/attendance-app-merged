@@ -1,0 +1,914 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/confirmRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EFEFEF"
+    android:orientation="vertical">
+
+    <!-- 상단 영역 -->
+    <LinearLayout
+        android:id="@+id/topHeader"
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:gravity="bottom|center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="24dp">
+
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="122dp"
+            android:layout_height="44dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/nulogo" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@android:color/transparent"
+            android:padding="8dp"
+            android:src="@drawable/menu"
+            android:tint="#555555" />
+    </LinearLayout>
+
+    <!-- 메인 콘텐츠 -->
+    <LinearLayout
+        android:id="@+id/contentArea"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp">
+
+        <!-- 제목 카드 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/titleCard"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
+
+            <TextView
+                android:id="@+id/tvConfirmTitle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/pretendard_bold"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:text="생리 공결"
+                android:textColor="#111111"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- 흰색 큰 박스 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/confirmMainCard"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
+
+            <FrameLayout
+                android:id="@+id/confirmFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!-- ========================= -->
+                <!-- 1. 기존 생리공결 목록 화면 -->
+                <!-- ========================= -->
+                <FrameLayout
+                    android:id="@+id/confirmListContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <!-- 목록 상단바 -->
+                        <LinearLayout
+                            android:id="@+id/listTopBar"
+                            android:layout_width="match_parent"
+                            android:layout_height="58dp"
+                            android:background="#F2F5FA"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <ImageButton
+                                android:id="@+id/btnSearchConfirm"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:background="@android:color/transparent"
+                                android:padding="8dp"
+                                android:src="@android:drawable/ic_menu_search"
+                                android:tint="#222222" />
+
+                            <TextView
+                                android:id="@+id/tvListPageTitle"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:gravity="center"
+                                android:text="공결관리"
+                                android:textColor="#111111"
+                                android:textSize="22sp"
+                                android:textStyle="bold" />
+
+                            <ImageButton
+                                android:id="@+id/btnListMenu"
+                                android:layout_width="44dp"
+                                android:layout_height="44dp"
+                                android:background="@android:color/transparent"
+                                android:padding="8dp"
+                                android:src="@drawable/menu"
+                                android:tint="#222222" />
+                        </LinearLayout>
+
+                        <!-- Kotlin에서 RecyclerView로 교체해도 되는 영역 -->
+                        <ScrollView
+                            android:id="@+id/confirmHistoryScroll"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fillViewport="true">
+
+                            <LinearLayout
+                                android:id="@+id/confirmHistoryList"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <!-- 목록 아이템 1 -->
+                                <LinearLayout
+                                    android:id="@+id/itemConfirmHistory1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="116dp"
+                                    android:background="#FFFFFF"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingStart="10dp"
+                                    android:paddingEnd="14dp">
+
+                                    <androidx.cardview.widget.CardView
+                                        android:layout_width="64dp"
+                                        android:layout_height="64dp"
+                                        app:cardBackgroundColor="#FF3658"
+                                        app:cardCornerRadius="5dp"
+                                        app:cardElevation="0dp">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:fontFamily="@font/pretendard_bold"
+                                            android:gravity="center"
+                                            android:text="승인"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="15sp"
+                                            android:textStyle="bold" />
+                                    </androidx.cardview.widget.CardView>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="16dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryTitle1"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/pretendard_bold"
+                                            android:text="생리공결"
+                                            android:textColor="#111111"
+                                            android:textSize="20sp"
+                                            android:textStyle="bold" />
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryDate1"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="10dp"
+                                            android:text="기간 : 2026-04-14"
+                                            android:textColor="#666666"
+                                            android:textSize="16sp" />
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryApplyDate1"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="4dp"
+                                            android:text="신청일 : 2026-04-14"
+                                            android:textColor="#666666"
+                                            android:textSize="16sp" />
+                                    </LinearLayout>
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#E4E4E4" />
+
+                                <!-- 목록 아이템 2 -->
+                                <LinearLayout
+                                    android:id="@+id/itemConfirmHistory2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="116dp"
+                                    android:background="#FFFFFF"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingStart="10dp"
+                                    android:paddingEnd="14dp">
+
+                                    <androidx.cardview.widget.CardView
+                                        android:layout_width="64dp"
+                                        android:layout_height="64dp"
+                                        app:cardBackgroundColor="#FF3658"
+                                        app:cardCornerRadius="5dp"
+                                        app:cardElevation="0dp">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:fontFamily="@font/pretendard_bold"
+                                            android:gravity="center"
+                                            android:text="승인"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="15sp"
+                                            android:textStyle="bold" />
+                                    </androidx.cardview.widget.CardView>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="16dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryTitle2"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/pretendard_bold"
+                                            android:text="생리공결"
+                                            android:textColor="#111111"
+                                            android:textSize="20sp"
+                                            android:textStyle="bold" />
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryDate2"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="10dp"
+                                            android:text="기간 : 2025-11-19"
+                                            android:textColor="#666666"
+                                            android:textSize="16sp" />
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryApplyDate2"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="4dp"
+                                            android:text="신청일 : 2025-11-19"
+                                            android:textColor="#666666"
+                                            android:textSize="16sp" />
+                                    </LinearLayout>
+                                </LinearLayout>
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#E4E4E4" />
+
+                                <!-- 목록 아이템 3 -->
+                                <LinearLayout
+                                    android:id="@+id/itemConfirmHistory3"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="116dp"
+                                    android:background="#FFFFFF"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingStart="10dp"
+                                    android:paddingEnd="14dp">
+
+                                    <androidx.cardview.widget.CardView
+                                        android:layout_width="64dp"
+                                        android:layout_height="64dp"
+                                        app:cardBackgroundColor="#FF3658"
+                                        app:cardCornerRadius="5dp"
+                                        app:cardElevation="0dp">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:fontFamily="@font/pretendard_bold"
+                                            android:gravity="center"
+                                            android:text="승인"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="15sp"
+                                            android:textStyle="bold" />
+                                    </androidx.cardview.widget.CardView>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="16dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryTitle3"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:fontFamily="@font/pretendard_bold"
+                                            android:text="생리공결"
+                                            android:textColor="#111111"
+                                            android:textSize="20sp"
+                                            android:textStyle="bold" />
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryDate3"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="10dp"
+                                            android:text="기간 : 2025-10-28"
+                                            android:textColor="#666666"
+                                            android:textSize="16sp" />
+
+                                        <TextView
+                                            android:id="@+id/tvHistoryApplyDate3"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="4dp"
+                                            android:text="신청일 : 2025-10-28"
+                                            android:textColor="#666666"
+                                            android:textSize="16sp" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </LinearLayout>
+                        </ScrollView>
+                    </LinearLayout>
+
+                    <!-- 오른쪽 아래 플러스 버튼 -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btnAddConfirmCard"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="24dp"
+                        app:cardBackgroundColor="#1685D4"
+                        app:cardCornerRadius="36dp"
+                        app:cardElevation="8dp">
+
+                        <TextView
+                            android:id="@+id/btnAddConfirm"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="+"
+                            android:textColor="#FFFFFF"
+                            android:textSize="42sp" />
+                    </androidx.cardview.widget.CardView>
+                </FrameLayout>
+
+                <!-- ========================= -->
+                <!-- 2. 생리공결 신청 화면 -->
+                <!-- ========================= -->
+                <LinearLayout
+                    android:id="@+id/confirmApplyContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#FFFFFF"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <!-- 신청 화면 상단바 -->
+                    <LinearLayout
+                        android:id="@+id/applyTopBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="58dp"
+                        android:background="#F2F5FA"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp">
+
+                        <ImageButton
+                            android:id="@+id/btnBackToConfirmList"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@android:color/transparent"
+                            android:padding="8dp"
+                            android:src="@android:drawable/ic_media_previous"
+                            android:tint="#222222" />
+
+                        <TextView
+                            android:id="@+id/tvApplyPageTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/pretendard_bold"
+                            android:gravity="center"
+                            android:text="공결관리"
+                            android:textColor="#111111"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/btnApplyMenu"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@android:color/transparent"
+                            android:padding="8dp"
+                            android:src="@android:drawable/ic_menu_sort_by_size"
+                            android:tint="#222222" />
+                    </LinearLayout>
+
+                    <ScrollView
+                        android:id="@+id/applyScroll"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:fillViewport="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <!-- 안내 문구 -->
+                            <LinearLayout
+                                android:id="@+id/ruleArea"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:paddingStart="22dp"
+                                android:paddingTop="18dp"
+                                android:paddingEnd="16dp"
+                                android:paddingBottom="18dp">
+
+                                <TextView
+                                    android:id="@+id/tvRule1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="• 학기당 4회, 직전 생리공결 일자 기준 15일 경과 후 신청 가능."
+                                    android:textColor="#111111"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvRule2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="• 중간고사, 기말고사 기간 및 사이버강좌(MOOC) 신청 불가."
+                                    android:textColor="#111111"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvRule3"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="8dp"
+                                    android:text="• 수업종료(출결 입력 완료 시점) 이후 출결반영 여부 확인"
+                                    android:textColor="#111111"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#CFCFCF" />
+
+                            <!-- 강의일 -->
+                            <LinearLayout
+                                android:id="@+id/dateRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="78dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="96dp"
+                                    android:layout_height="match_parent"
+                                    android:background="#F3F3F3"
+                                    android:fontFamily="@font/pretendard_bold"
+                                    android:gravity="center"
+                                    android:text="강의일"
+                                    android:textColor="#111111"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvSelectedDate"
+                                    android:layout_width="150dp"
+                                    android:layout_height="48dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="14dp"
+                                    android:background="#FFFFFF"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="14dp"
+                                    android:text="날짜"
+                                    android:textColor="#777777"
+                                    android:textSize="16sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#D6D6D6" />
+
+                            <!-- 미니 달력: Kotlin에서 날짜 입력칸 클릭 시 visible -->
+                            <DatePicker
+                                android:id="@+id/datePickerLecture"
+                                android:layout_width="match_parent"
+                                android:layout_height="330dp"
+                                android:calendarViewShown="true"
+                                android:datePickerMode="calendar"
+                                android:spinnersShown="false"
+                                android:visibility="gone" />
+
+                            <!-- 공결 사유 -->
+                            <LinearLayout
+                                android:id="@+id/reasonRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="82dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="96dp"
+                                    android:layout_height="match_parent"
+                                    android:background="#F3F3F3"
+                                    android:fontFamily="@font/pretendard_bold"
+                                    android:gravity="center"
+                                    android:text="공결 사유"
+                                    android:textColor="#111111"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <LinearLayout
+                                    android:id="@+id/reasonSelectBox"
+                                    android:layout_width="0dp"
+                                    android:layout_height="50dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="14dp"
+                                    android:layout_marginEnd="14dp"
+                                    android:layout_weight="1"
+                                    android:background="#FFFFFF"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal"
+                                    android:paddingStart="14dp"
+                                    android:paddingEnd="12dp">
+
+                                    <TextView
+                                        android:id="@+id/tvSelectedReason"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="center_vertical"
+                                        android:text="선택"
+                                        android:textColor="#333333"
+                                        android:textSize="16sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvReasonArrow"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:gravity="center"
+                                        android:text="⌄"
+                                        android:textColor="#777777"
+                                        android:textSize="26sp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- 사유 드롭다운 -->
+                            <LinearLayout
+                                android:id="@+id/reasonDropdown"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="96dp"
+                                android:layout_marginEnd="14dp"
+                                android:background="#FFFFFF"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <TextView
+                                    android:id="@+id/optionReasonDefault"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="54dp"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="18dp"
+                                    android:text="✓  선택"
+                                    android:textColor="#111111"
+                                    android:textSize="17sp" />
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:background="#E5E5E5" />
+
+                                <TextView
+                                    android:id="@+id/optionReasonPeriod"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="54dp"
+                                    android:gravity="center_vertical"
+                                    android:paddingStart="46dp"
+                                    android:text="생리공결"
+                                    android:textColor="#111111"
+                                    android:textSize="17sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#D6D6D6" />
+
+                            <!-- 공결 내용 -->
+                            <LinearLayout
+                                android:id="@+id/contentRow"
+                                android:layout_width="match_parent"
+                                android:layout_height="96dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="96dp"
+                                    android:layout_height="match_parent"
+                                    android:background="#F3F3F3"
+                                    android:fontFamily="@font/pretendard_bold"
+                                    android:gravity="center"
+                                    android:text="공결 내용"
+                                    android:textColor="#111111"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <EditText
+                                    android:id="@+id/etConfirmContent"
+                                    android:layout_width="0dp"
+                                    android:layout_height="70dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginStart="14dp"
+                                    android:layout_marginEnd="14dp"
+                                    android:layout_weight="1"
+                                    android:background="#FFFFFF"
+                                    android:gravity="top|start"
+                                    android:hint="100자 이하로 입력해주세요."
+                                    android:inputType="textMultiLine"
+                                    android:maxLength="100"
+                                    android:padding="10dp"
+                                    android:textColor="#111111"
+                                    android:textColorHint="#AAAAAA"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="#D6D6D6" />
+
+                            <!-- 수업 목록 테이블 헤더 -->
+                            <TableLayout
+                                android:id="@+id/classTableHeader"
+                                android:layout_width="match_parent"
+                                android:layout_height="82dp"
+                                android:background="#F3F3F3"
+                                android:stretchColumns="1,2,3,4">
+
+                                <TableRow
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent">
+
+                                    <TextView
+                                        android:layout_width="58dp"
+                                        android:layout_height="match_parent"
+                                        android:fontFamily="@font/pretendard_bold"
+                                        android:gravity="center"
+                                        android:text="선택"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/pretendard_bold"
+                                        android:gravity="center"
+                                        android:text="요일"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/pretendard_bold"
+                                        android:gravity="center"
+                                        android:text="교시"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1.7"
+                                        android:fontFamily="@font/pretendard_bold"
+                                        android:gravity="center"
+                                        android:text="과목명"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="0.9"
+                                        android:fontFamily="@font/pretendard_bold"
+                                        android:gravity="center"
+                                        android:text="교수명"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+                                </TableRow>
+                            </TableLayout>
+
+                            <!-- 날짜 선택 전 문구 -->
+                            <TextView
+                                android:id="@+id/tvNoDateSelected"
+                                android:layout_width="match_parent"
+                                android:layout_height="56dp"
+                                android:gravity="center"
+                                android:text="기간을 입력하세요."
+                                android:textColor="#111111"
+                                android:textSize="16sp"
+                                android:visibility="visible" />
+
+                            <!-- 날짜 선택 후 수업 목록 -->
+                            <TableLayout
+                                android:id="@+id/classListTable"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:stretchColumns="1,2,3,4"
+                                android:visibility="gone">
+
+                                <TableRow
+                                    android:id="@+id/classRow1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="82dp"
+                                    android:background="#FFFFFF">
+
+                                    <RadioButton
+                                        android:id="@+id/rbClass1"
+                                        android:layout_width="58dp"
+                                        android:layout_height="match_parent"
+                                        android:buttonTint="#BDBDBD"
+                                        android:gravity="center" />
+
+                                    <TextView
+                                        android:id="@+id/tvClassDay1"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:text="2026-05-10"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvClassPeriod1"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:text="105-109"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvClassName1"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1.7"
+                                        android:gravity="center"
+                                        android:text="머신러닝 및 실습\n(002분반)"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvProfessorName1"
+                                        android:layout_width="0dp"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="0.9"
+                                        android:gravity="center"
+                                        android:text="이상웅"
+                                        android:textColor="#111111"
+                                        android:textSize="14sp" />
+                                </TableRow>
+                            </TableLayout>
+
+                            <!-- 신청 버튼 -->
+                            <TextView
+                                android:id="@+id/btnSubmitConfirm"
+                                android:layout_width="match_parent"
+                                android:layout_height="70dp"
+                                android:layout_marginTop="0dp"
+                                android:background="#1685D4"
+                                android:fontFamily="@font/pretendard_bold"
+                                android:gravity="center"
+                                android:text="신청"
+                                android:textColor="#FFFFFF"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+                    </ScrollView>
+                </LinearLayout>
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- 하단 메뉴 -->
+    <LinearLayout
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@color/primarybase"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnBottomHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/home"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomRefresh"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/retry"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomNotice"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/bell"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomSchedule"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/calendar"
+            android:tint="#FFFFFF" />
+
+        <ImageButton
+            android:id="@+id/btnBottomLogout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:padding="26dp"
+            android:src="@drawable/back"
+            android:tint="#FFFFFF" />
+    </LinearLayout>
+
+</LinearLayout>
