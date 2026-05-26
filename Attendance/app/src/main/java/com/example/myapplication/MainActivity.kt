@@ -19,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.example.myapplication.launcher.AttendanceServiceLauncher
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -45,6 +46,12 @@ class MainActivity : Activity() {
     private var pinPopupShowing = false
     private var uwbRunnable: Runnable? = null
 
+    /** 출석 Service trigger + 권한 흐름 + Service→Activity broadcast 수신 헬퍼. */
+    private lateinit var launcher: AttendanceServiceLauncher
+
+    /** 페이즈 UI 전환(15분 후 After15+UWB 카드) 클라이언트 timer. */
+    private var phaseTransitionRunnable: Runnable? = null
+
     companion object {
         private const val DEFAULT_SUBJECT_CODE = "14454001"
         private const val BLUE_ACTIVE = "#015EB6"
@@ -63,6 +70,10 @@ class MainActivity : Activity() {
         drawerLayout = findViewById(R.id.drawerLayout)
         contentFrame = findViewById(R.id.contentFrame)
 
+        // 출석 Service 통합 헬퍼 — 권한/Service trigger/broadcast 수신 캡슐화
+        launcher = AttendanceServiceLauncher(this)
+        launcher.setListener(sessionListener)
+
         if (userRole == "professor") {
             loadPage(R.layout.main_p_1)
         } else {
@@ -72,9 +83,85 @@ class MainActivity : Activity() {
         setupDrawerMenuClick()
     }
 
+    override fun onResume() {
+        super.onResume()
+        launcher.registerReceiver()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        launcher.unregisterReceiver()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        launcher.handlePermissionResult(requestCode, grantResults)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         uwbRunnable?.let { handler.removeCallbacks(it) }
+        phaseTransitionRunnable?.let { handler.removeCallbacks(it) }
+    }
+
+    /**
+     * AttendanceServiceLauncher → MainActivity broadcast 수신 콜백.
+     *
+     * dual-write 구조에서 server가 RTDB에 데이터 mirror하므로 그쪽 화면(FirebaseClient.get 기반)이
+     * 다음 refresh 시 자동 반영됨. 여기선 Toast / 즉시 UI 갱신만 담당.
+     */
+    private val sessionListener = object : AttendanceServiceLauncher.SessionEventsListener {
+        // 교수: /start 성공 — 받은 4자리 PIN을 즉시 UI에 표시
+        override fun onSessionStarted(sessionCode: String?, lectureSessionId: String?) {
+            val pageView = contentFrame.getChildAt(0) ?: return
+            showPin(pageView, sessionCode ?: "")
+            Toast.makeText(
+                this@MainActivity,
+                "출석체크가 시작되었습니다 (PIN: $sessionCode)",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        // 교수: /start 실패 또는 학생: check-in 실패
+        override fun onSessionFailed(reason: String?) {
+            Toast.makeText(this@MainActivity, "출석 시작 실패: $reason", Toast.LENGTH_LONG).show()
+        }
+
+        // 교수: 5분 BLE 광고 종료 (Service는 계속 살아있음 — PIN 수동 입력 계속 가능)
+        override fun onSessionExpired() {
+            Toast.makeText(
+                this@MainActivity,
+                "BLE 광고 종료 (PIN 수동 입력 계속 가능)",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        // 학생: BLE 또는 PIN으로 출석 등록 성공
+        override fun onAttendanceConfirmed(sessionCode: String?) {
+            val pageView = contentFrame.getChildAt(0) ?: return
+            setText(pageView, "tvAttendanceStatus", "출석")
+            Toast.makeText(this@MainActivity, "출석 처리되었습니다", Toast.LENGTH_SHORT).show()
+            // RTDB 미러링도 다음 refresh에 반영됨 — 즉시 버튼 상태 갱신
+            refreshStudentAttendanceButtonState(pageView)
+        }
+
+        // 학생: check-in 실패 (잘못된 PIN / 미수강 등)
+        override fun onAttendanceFailed(reason: String?) {
+            Toast.makeText(this@MainActivity, "출석 실패: $reason", Toast.LENGTH_LONG).show()
+        }
+
+        // 학생: UWB ranging 3회 연속 실패 → ABSENT
+        override fun onAttendanceAbsent(attendanceId: String?) {
+            val pageView = contentFrame.getChildAt(0) ?: return
+            setText(pageView, "tvAttendanceStatus", "결석")
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("결석 처리")
+                .setMessage("UWB 재실 검증에 3회 연속 실패하여 결석 처리되었습니다.")
+                .setPositiveButton("확인", null)
+                .show()
+        }
     }
 
     private fun readLoginInfo() {
@@ -270,7 +357,9 @@ class MainActivity : Activity() {
             if (status == "BLUETOOTH_ACTIVE" && now <= bluetoothEndAt) {
                 setAttendanceButtonActive(btnAttendance)
                 btnAttendance.setOnClickListener {
-                    saveBluetoothAttendance(pageView)
+                    // 통합: Firebase 직접 PUT 대신 launcher 경유.
+                    // RTDB에서 읽은 pinCode를 그대로 server에 보내 검증/dual-write.
+                    saveBluetoothAttendance(pageView, sessionJson)
                 }
                 return@get
             }
@@ -302,25 +391,27 @@ class MainActivity : Activity() {
         button.alpha = 1.0f
     }
 
-    private fun saveBluetoothAttendance(pageView: View) {
+    /**
+     * 통합 후 동작:
+     *   - sessionJson에서 pinCode를 읽어 launcher.submitPin으로 server에 전송
+     *   - server가 sessionCode 검증 + Firestore + RTDB Attendance_Records dual-write
+     *   - 결과는 sessionListener.onAttendanceConfirmed / onAttendanceFailed로 도착
+     *
+     * 시그니처에 sessionJson 추가: refreshStudentAttendanceButtonState가 이미 읽은 세션 데이터를
+     * 재사용 (Firebase 한 번 더 GET 안 함).
+     */
+    private fun saveBluetoothAttendance(pageView: View, sessionJson: JSONObject) {
         if (currentSubjectCode.isBlank()) {
             Toast.makeText(this, "현재 수업 정보가 없습니다", Toast.LENGTH_SHORT).show()
             return
         }
-
-        val today = apiDateText()
-
-        val body = JSONObject()
-            .put("finalStatus", "출석")
-            .put("authMethod", "BLUETOOTH")
-            .put("missedCount", 0)
-            .put("checkedAt", System.currentTimeMillis())
-
-        FirebaseClient.put("Attendance_Records/$currentSubjectCode/$today/$userId", body) {
-            setText(pageView, "tvAttendanceStatus", "출석")
-            Toast.makeText(this, "블루투스 출석 완료", Toast.LENGTH_SHORT).show()
-            refreshStudentAttendanceButtonState(pageView)
+        val pinCode = sessionJson.optString("pinCode", "")
+        if (pinCode.isBlank()) {
+            Toast.makeText(this, "세션 PIN 정보가 없습니다", Toast.LENGTH_SHORT).show()
+            return
         }
+        Toast.makeText(this, "출석 요청 중...", Toast.LENGTH_SHORT).show()
+        launcher.submitPin(userId, pinCode)
     }
 
     private fun checkStudentPinEligibilityAndShow(pageView: View, sessionJson: JSONObject) {
@@ -391,8 +482,6 @@ class MainActivity : Activity() {
                     etPin3.text.toString() +
                     etPin4.text.toString()
 
-            val realPin = sessionJson.optString("pinCode", "")
-
             if (System.currentTimeMillis() > pinEndAt) {
                 tvPinResultMessage.visibility = View.VISIBLE
                 tvPinResultMessage.text = "PIN 입력 시간이 종료되었습니다."
@@ -405,26 +494,11 @@ class MainActivity : Activity() {
                 return@setOnClickListener
             }
 
-            if (inputPin != realPin) {
-                tvPinResultMessage.visibility = View.VISIBLE
-                tvPinResultMessage.text = "PIN 번호가 올바르지 않습니다."
-                return@setOnClickListener
-            }
-
-            val finalStatus = if (System.currentTimeMillis() < classStartAt + TEN_MINUTES) {
-                "출석"
-            } else {
-                "결석"
-            }
-
-            savePinAttendance(pageView, finalStatus) {
-                if (finalStatus == "출석") {
-                    Toast.makeText(this, "PIN 인증 완료. 출석 처리되었습니다", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "PIN 인증 완료. 결석 처리되었습니다", Toast.LENGTH_SHORT).show()
-                }
-                dialog.dismiss()
-            }
+            // 통합 후: 클라 PIN 검증 / Firebase PUT 제거.
+            // server가 sessionCode 검증 (잘못된 PIN이면 onAttendanceFailed) + dual-write.
+            // 출석/결석 판정도 server가 시간 기반으로 결정 (BLE 페이즈/PIN 페이즈 + classStartAt+10min).
+            launcher.submitPin(userId, inputPin)
+            dialog.dismiss()
         }
 
         dialog.setOnDismissListener {
@@ -450,46 +524,52 @@ class MainActivity : Activity() {
         }
     }
 
+    /**
+     * 통합 후 동작:
+     *   - 클라가 Firebase Attendance_Session에 직접 PUT 안 함.
+     *   - launcher.startProfessor → server /start → server가 RTDB dual-write.
+     *   - 받은 PIN은 sessionListener.onSessionStarted 콜백으로 전달 → showPin 표시.
+     *   - BLE 광고 / UWB ranging은 우리 Service가 자동 진행 (5분 주기 등).
+     *   - 페이즈 UI 전환(After15+UWB 카드)은 classStartAt + 15min 시점에 클라 timer로 표시.
+     */
     private fun startAttendanceSession(pageView: View) {
         if (currentSubjectCode.isBlank()) {
             currentSubjectCode = DEFAULT_SUBJECT_CODE
         }
-
-        val today = apiDateText()
-        val pinCode = Random.nextInt(1000, 9999).toString()
-
         val now = System.currentTimeMillis()
         val classStartAt = todayMillisFromTime(currentClassStartTime)
-        val bluetoothEndAt = now + FIVE_MINUTES
         val pinEndAt = classStartAt + FIFTEEN_MINUTES
 
-        val body = JSONObject()
-            .put("authMethod", "BLUETOOTH_PIN_UWB")
-            .put("pinCode", pinCode)
-            .put("status", "BLUETOOTH_ACTIVE")
-            .put("startedAt", now)
-            .put("bluetoothEndAt", bluetoothEndAt)
-            .put("pinEndAt", pinEndAt)
-            .put("classStartAt", classStartAt)
-            .put("uwbCheckCount", 0)
+        // 출석 Service 시작 (권한/UWB feature 체크는 launcher 내부에서)
+        launcher.startProfessor(currentSubjectCode, userId, classStartAt)
 
-        FirebaseClient.put("Attendance_Session/$currentSubjectCode/$today", body) {
-            showPin(pageView, pinCode)
-            updateProfessorSessionUi(pageView, body)
-            Toast.makeText(this, "출석체크가 시작되었습니다", Toast.LENGTH_SHORT).show()
-
-            handler.postDelayed({
-                expireBluetoothAndOpenPin(pageView)
-            }, FIVE_MINUTES)
-
-            val delayToAfter15 = (pinEndAt - now).coerceAtLeast(0L)
-            handler.postDelayed({
-                finishPinAndShowUwb(pageView)
-            }, delayToAfter15)
-        }
+        // 페이즈 UI 전환 timer — classStartAt + 15min 기준 (수업 시작 + 15분).
+        // 교수가 시작 누른 시점이 아니라 수업 시작 시각이 기준.
+        val delayToAfter15 = (pinEndAt - now).coerceAtLeast(0L)
+        phaseTransitionRunnable?.let { handler.removeCallbacks(it) }
+        phaseTransitionRunnable = Runnable { transitionToAfter15Phase(pageView) }
+        handler.postDelayed(phaseTransitionRunnable!!, delayToAfter15)
     }
 
+    /** 수업 시작 + 15분 시점에 클라 측에서만 카드 전환 (서버/RTDB WRITE 없음). */
+    private fun transitionToAfter15Phase(pageView: View) {
+        findChildByIdName<View>(pageView, "cardProfessorControlBefore15")?.visibility = View.GONE
+        findChildByIdName<View>(pageView, "cardProfessorControlAfter15")?.visibility = View.VISIBLE
+        findChildByIdName<View>(pageView, "cardUwbMiddleCheck")?.visibility = View.VISIBLE
+        val btnRollCall = findChildByIdName<Button>(pageView, "btnRollCallAttendance")
+        val btnProfessorAttendanceCheck = findChildByIdName<Button>(pageView, "btnProfessorAttendanceCheck")
+        btnRollCall?.isEnabled = false
+        btnRollCall?.alpha = 0.4f
+        btnProfessorAttendanceCheck?.isEnabled = false
+        btnProfessorAttendanceCheck?.alpha = 0.4f
+    }
+
+    /**
+     * dual-write 통합 후: 사용 안 함 (RTDB status 전환은 시간 기반으로 자연 계산).
+     * 본문 주석 처리만 — 함수 시그니처/호출 자리는 향후 참조용으로 보존.
+     */
     private fun expireBluetoothAndOpenPin(pageView: View) {
+        /*
         val today = apiDateText()
 
         FirebaseClient.get("Attendance_Session/$currentSubjectCode/$today") { sessionJson ->
@@ -503,9 +583,14 @@ class MainActivity : Activity() {
                 updateProfessorSessionUi(pageView, body)
             }
         }
+        */
     }
 
+    /**
+     * dual-write 통합 후: 사용 안 함. 페이즈 UI 전환은 transitionToAfter15Phase가 담당.
+     */
     private fun finishPinAndShowUwb(pageView: View) {
+        /*
         val today = apiDateText()
 
         FirebaseClient.get("Attendance_Session/$currentSubjectCode/$today") { sessionJson ->
@@ -520,6 +605,7 @@ class MainActivity : Activity() {
                 startUwbLoop(pageView)
             }
         }
+        */
     }
 
     private fun loadProfessorPage(pageView: View) {
@@ -610,7 +696,12 @@ class MainActivity : Activity() {
         }
     }
 
+    /**
+     * dual-write 통합 후: 사용 안 함. 진짜 UWB ranging은 ProfessorAttendanceService가 처리.
+     * 본문 주석 처리 — UI 카운터 표시는 추후 server broadcast로 대체 예정.
+     */
     private fun startUwbLoop(pageView: View) {
+        /*
         uwbRunnable?.let { handler.removeCallbacks(it) }
 
         uwbRunnable = object : Runnable {
@@ -621,9 +712,11 @@ class MainActivity : Activity() {
         }
 
         handler.post(uwbRunnable!!)
+        */
     }
 
     private fun runUwbCheck(pageView: View) {
+        /*
         val today = apiDateText()
 
         FirebaseClient.get("Attendance_Session/$currentSubjectCode/$today") { sessionJson ->
@@ -665,6 +758,7 @@ class MainActivity : Activity() {
                 }
             }
         }
+        */
     }
 
     private fun loadProfessorRows(pageView: View, recordsJson: JSONObject?) {
@@ -1048,7 +1142,11 @@ class MainActivity : Activity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
+    /**
+     * dual-write 통합 후: 사용 안 함. 본문 주석 처리.
+     */
     private fun testUwbMonitorAndDatabase() {
+        /*
         updateLog("[테스트 4] UWB 모니터 ↔ 실제 DB 연동 테스트 시작...")
 
         val testSubjectCode = "TEST_SUBJECT"
@@ -1098,6 +1196,7 @@ class MainActivity : Activity() {
         handler.postDelayed({
             updateLog("[테스트 4] DB 연동 테스트 자동 종료.")
         }, 60000L * randomFailCount + 5000L)
+        */
     }
 
     private fun logout() {

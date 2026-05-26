@@ -32,3 +32,6 @@ Thumbs.db
 # google-services.json은 client config라 commit OK (Google 공식).
 # 진짜 보안은 Firebase Security Rules + Google Cloud API key restrictions로.
 # 팀원 협업 편의 위해 의도적으로 추적함.
+
+# ── 통합 작업 참조용 (재통합 끝나면 삭제 가능) ──
+.merge-src/

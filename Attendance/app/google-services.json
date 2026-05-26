@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "321595305285",
+    "firebase_url": "https://attendanceapp-cbf00-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "attendanceapp-cbf00",
+    "storage_bucket": "attendanceapp-cbf00.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321595305285:android:277fc5926c92d03c36622c",
+        "android_client_info": {
+          "package_name": "com.example.gachonattendance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWJaoX-z-vq0JBt9D9GpiSnahtMP-eUmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321595305285:android:d878dc50c0acdded36622c",
+        "android_client_info": {
+          "package_name": "com.example.uwbattendance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWJaoX-z-vq0JBt9D9GpiSnahtMP-eUmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

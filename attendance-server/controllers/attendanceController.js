@@ -2,7 +2,7 @@ const attendanceService = require('../services/attendanceService');
 
 exports.startAttendanceSession = async (req, res) => {
     try {
-        const {courseId, professorId, professorUwbAddress} = req.body;
+        const {courseId, professorId, professorUwbAddress, classStartAt} = req.body;
         if(!courseId || !professorId || !professorUwbAddress) {
             return res.status(400).json({
                 success: false,
@@ -10,8 +10,9 @@ exports.startAttendanceSession = async (req, res) => {
             });
         }
 
+        // classStartAt은 optional. 없으면 서버가 now로 fallback (dual-write 화면에서 시간 계산용).
         const result = await attendanceService.startAttendanceSession({
-            courseId, professorId, professorUwbAddress
+            courseId, professorId, professorUwbAddress, classStartAt
         });
         return res.status(200).json({success: true, data: result});
     } catch(error) {

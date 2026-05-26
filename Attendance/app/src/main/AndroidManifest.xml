@@ -2,7 +2,43 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 백엔드 API 통신용 -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Foreground Service (Service-ready 전환) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <!-- Android 13+ 알림 권한 (Foreground Service 알림 표시용) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Android 11 이하 (Note 9 등): 레거시 BLE 권한 -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+
+    <!-- Android 12+ (S23 Ultra 등): 신권한 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+
+    <!-- BLE 스캔용 위치 권한 (Android 11 이하 필수) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- UWB (Phase 3) -->
+    <uses-feature
+        android:name="android.hardware.uwb"
+        android:required="false" />
+    <uses-permission android:name="android.permission.UWB_RANGING" />
+
+    <!-- 수업 시작 5분 전 알림 (Stage 4) -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <!-- 재부팅 후 시간표 알람 자동 재등록 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -13,45 +49,76 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:theme="@style/Theme.MyApplication">
 
+        <!-- 앱 시작 화면 (launcher) -->
         <activity
             android:name=".LoadingActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
+        <!-- 로그인 화면 -->
         <activity
             android:name=".LoginActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
 
+        <!-- 회원가입 화면 -->
         <activity
             android:name=".SignupActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
 
+        <!-- 메인 화면 / 사이드바 / 하단바 / 화면 전환 -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.MyApplication" />
 
+        <!-- 주간 출결 화면 -->
         <activity
             android:name=".WeekActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
 
+        <!-- 시간표 등록 화면 -->
         <activity
             android:name=".RegisterScheduleActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication" />
+
+        <!-- ── 통합: 출석 Foreground Service (교수/학생 분리) ── -->
+        <service
+            android:name=".service.ProfessorAttendanceService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+        <service
+            android:name=".service.StudentAttendanceService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
+        <!-- ── 통합: 수업 시작 5분 전 알림 ── -->
+        <!-- ScheduleAlarmManager의 AlarmManager 알람 수신. 앱 내부에서만 trigger되므로 exported=false. -->
+        <receiver
+            android:name=".schedule.receiver.ClassReminderReceiver"
+            android:exported="false" />
+
+        <!-- ── 통합: 부팅 후 시간표 알람 재등록 ── -->
+        <!-- BOOT_COMPLETED는 시스템 broadcast이므로 exported=true. -->
+        <receiver
+            android:name=".schedule.receiver.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
