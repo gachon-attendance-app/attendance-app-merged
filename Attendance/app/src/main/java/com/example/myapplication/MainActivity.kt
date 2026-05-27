@@ -45,6 +45,7 @@ class MainActivity : Activity() {
     private val handler = Handler(Looper.getMainLooper())
     private var pinPopupShowing = false
     private var uwbRunnable: Runnable? = null
+    private var attendanceRefreshRunnable: Runnable? = null
 
     /** 출석 Service trigger + 권한 흐름 + Service→Activity broadcast 수신 헬퍼. */
     private lateinit var launcher: AttendanceServiceLauncher
@@ -103,6 +104,7 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         super.onDestroy()
         uwbRunnable?.let { handler.removeCallbacks(it) }
+        attendanceRefreshRunnable?.let { handler.removeCallbacks(it) }
         phaseTransitionRunnable?.let { handler.removeCallbacks(it) }
     }
 
@@ -173,6 +175,8 @@ class MainActivity : Activity() {
 
     private fun loadPage(layoutResId: Int) {
         currentPageResId = layoutResId
+        attendanceRefreshRunnable?.let { handler.removeCallbacks(it) }
+        attendanceRefreshRunnable = null
         contentFrame.removeAllViews()
 
         val pageView = LayoutInflater.from(this).inflate(layoutResId, contentFrame, false)
@@ -327,9 +331,16 @@ class MainActivity : Activity() {
         val btnAttendance = pageView.findViewById<Button?>(R.id.btnAttendance) ?: return
         setAttendanceButtonInactive(btnAttendance)
 
-        handler.postDelayed({
-            refreshStudentAttendanceButtonState(pageView)
-        }, 300)
+        attendanceRefreshRunnable?.let { handler.removeCallbacks(it) }
+        attendanceRefreshRunnable = object : Runnable {
+            override fun run() {
+                if (currentPageResId == R.layout.main1) {
+                    refreshStudentAttendanceButtonState(pageView)
+                    handler.postDelayed(this, 3000L)
+                }
+            }
+        }
+        handler.postDelayed(attendanceRefreshRunnable!!, 500L)
     }
 
     private fun refreshStudentAttendanceButtonState(pageView: View) {
@@ -340,6 +351,23 @@ class MainActivity : Activity() {
             currentSubjectCode = DEFAULT_SUBJECT_CODE
         }
 
+        FirebaseClient.get("Attendance_Records/$currentSubjectCode/$today/$userId") { recordJson ->
+            val currentStatus = recordJson?.optString("finalStatus", "") ?: ""
+            if (currentStatus == "출석" || currentStatus == "異쒖꽍" ||
+                currentStatus == "결석" || currentStatus == "寃곗꽍") {
+                setAttendanceButtonInactive(btnAttendance)
+                setText(pageView, "tvAttendanceStatus", currentStatus)
+                btnAttendance.setOnClickListener {
+                    Toast.makeText(this, "이미 출석 처리되었습니다", Toast.LENGTH_SHORT).show()
+                }
+                return@get
+            }
+
+            refreshStudentAttendanceSessionState(pageView, btnAttendance, today)
+        }
+    }
+
+    private fun refreshStudentAttendanceSessionState(pageView: View, btnAttendance: Button, today: String) {
         FirebaseClient.get("Attendance_Session/$currentSubjectCode/$today") { sessionJson ->
             if (sessionJson == null) {
                 setAttendanceButtonInactive(btnAttendance)
@@ -357,9 +385,7 @@ class MainActivity : Activity() {
             if (status == "BLUETOOTH_ACTIVE" && now <= bluetoothEndAt) {
                 setAttendanceButtonActive(btnAttendance)
                 btnAttendance.setOnClickListener {
-                    // 통합: Firebase 직접 PUT 대신 launcher 경유.
-                    // RTDB에서 읽은 pinCode를 그대로 server에 보내 검증/dual-write.
-                    saveBluetoothAttendance(pageView, sessionJson)
+                    startBluetoothAttendanceScan()
                 }
                 return@get
             }
@@ -370,7 +396,6 @@ class MainActivity : Activity() {
                 btnAttendance.setOnClickListener {
                     checkStudentPinEligibilityAndShow(pageView, sessionJson)
                 }
-                checkStudentPinEligibilityAndShow(pageView, sessionJson)
             } else {
                 btnAttendance.setOnClickListener {
                     Toast.makeText(this, "출석체크 시간이 아닙니다", Toast.LENGTH_SHORT).show()
@@ -392,26 +417,17 @@ class MainActivity : Activity() {
     }
 
     /**
-     * 통합 후 동작:
-     *   - sessionJson에서 pinCode를 읽어 launcher.submitPin으로 server에 전송
-     *   - server가 sessionCode 검증 + Firestore + RTDB Attendance_Records dual-write
-     *   - 결과는 sessionListener.onAttendanceConfirmed / onAttendanceFailed로 도착
-     *
-     * 시그니처에 sessionJson 추가: refreshStudentAttendanceButtonState가 이미 읽은 세션 데이터를
-     * 재사용 (Firebase 한 번 더 GET 안 함).
+     * BLE phase student flow:
+     *   교수 Service가 광고 중인 sessionCode를 학생 Service가 BLE scan으로 찾고,
+     *   찾은 code로 server /check-in을 호출한다.
      */
-    private fun saveBluetoothAttendance(pageView: View, sessionJson: JSONObject) {
-        if (currentSubjectCode.isBlank()) {
-            Toast.makeText(this, "현재 수업 정보가 없습니다", Toast.LENGTH_SHORT).show()
+    private fun startBluetoothAttendanceScan() {
+        if (userId.isBlank()) {
+            Toast.makeText(this, "로그인 정보가 없습니다", Toast.LENGTH_SHORT).show()
             return
         }
-        val pinCode = sessionJson.optString("pinCode", "")
-        if (pinCode.isBlank()) {
-            Toast.makeText(this, "세션 PIN 정보가 없습니다", Toast.LENGTH_SHORT).show()
-            return
-        }
-        Toast.makeText(this, "출석 요청 중...", Toast.LENGTH_SHORT).show()
-        launcher.submitPin(userId, pinCode)
+        Toast.makeText(this, "BLE 출석 신호를 찾는 중...", Toast.LENGTH_SHORT).show()
+        launcher.startStudent(userId)
     }
 
     private fun checkStudentPinEligibilityAndShow(pageView: View, sessionJson: JSONObject) {
@@ -556,8 +572,8 @@ class MainActivity : Activity() {
         findChildByIdName<View>(pageView, "cardProfessorControlBefore15")?.visibility = View.GONE
         findChildByIdName<View>(pageView, "cardProfessorControlAfter15")?.visibility = View.VISIBLE
         findChildByIdName<View>(pageView, "cardUwbMiddleCheck")?.visibility = View.VISIBLE
-        val btnRollCall = findChildByIdName<Button>(pageView, "btnRollCallAttendance")
-        val btnProfessorAttendanceCheck = findChildByIdName<Button>(pageView, "btnProfessorAttendanceCheck")
+        val btnRollCall = findChildByIdName<View>(pageView, "btnRollCallAttendance")
+        val btnProfessorAttendanceCheck = findChildByIdName<View>(pageView, "btnProfessorAttendanceCheck")
         btnRollCall?.isEnabled = false
         btnRollCall?.alpha = 0.4f
         btnProfessorAttendanceCheck?.isEnabled = false
@@ -651,7 +667,7 @@ class MainActivity : Activity() {
         val cardBefore15 = findChildByIdName<View>(pageView, "cardProfessorControlBefore15")
         val cardAfter15 = findChildByIdName<View>(pageView, "cardProfessorControlAfter15")
         val cardUwb = findChildByIdName<View>(pageView, "cardUwbMiddleCheck")
-        val btnRollCall = findChildByIdName<Button>(pageView, "btnRollCallAttendance")
+        val btnRollCall = findChildByIdName<View>(pageView, "btnRollCallAttendance")
         val btnProfessorAttendanceCheck = findChildByIdName<Button>(pageView, "btnProfessorAttendanceCheck")
 
         if (sessionJson == null) {
@@ -662,8 +678,10 @@ class MainActivity : Activity() {
             showPin(pageView, "")
             btnRollCall?.isEnabled = true
             btnRollCall?.alpha = 1.0f
+            btnRollCall?.setBackgroundResource(R.drawable.bg_attendance_button_blue)
             btnProfessorAttendanceCheck?.isEnabled = true
             btnProfessorAttendanceCheck?.alpha = 1.0f
+            btnProfessorAttendanceCheck?.setBackgroundResource(R.drawable.bg_attendance_button_blue)
             return
         }
 
@@ -678,8 +696,10 @@ class MainActivity : Activity() {
             cardUwb?.visibility = View.VISIBLE
             btnRollCall?.isEnabled = false
             btnRollCall?.alpha = 0.4f
+            btnRollCall?.setBackgroundResource(R.drawable.bg_attendance_button_gray)
             btnProfessorAttendanceCheck?.isEnabled = false
             btnProfessorAttendanceCheck?.alpha = 0.4f
+            btnProfessorAttendanceCheck?.setBackgroundResource(R.drawable.bg_attendance_button_gray)
             startUwbLoop(pageView)
         } else {
             cardBefore15?.visibility = View.VISIBLE
@@ -690,9 +710,11 @@ class MainActivity : Activity() {
 
             btnRollCall?.isEnabled = false
             btnRollCall?.alpha = 0.4f
+            btnRollCall?.setBackgroundResource(R.drawable.bg_attendance_button_gray)
 
             btnProfessorAttendanceCheck?.isEnabled = false
             btnProfessorAttendanceCheck?.alpha = 0.6f
+            btnProfessorAttendanceCheck?.setBackgroundResource(R.drawable.bg_attendance_button_gray)
         }
     }
 

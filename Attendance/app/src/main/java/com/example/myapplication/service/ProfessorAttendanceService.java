@@ -177,8 +177,8 @@ public class ProfessorAttendanceService extends Service {
 
     private void startForegroundCompat() {
         Notification n = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("출석 세션 진행 중")
-                .setContentText("학생들이 출석할 수 있도록 BLE 광고 중입니다")
+                .setContentTitle("출석 진행 중")
+                .setContentText("출석 진행 중")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
                 .build();

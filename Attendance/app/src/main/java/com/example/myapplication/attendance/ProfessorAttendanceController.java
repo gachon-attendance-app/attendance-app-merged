@@ -53,8 +53,8 @@ public class  ProfessorAttendanceController {
 
     private static final String TAG = "ProfessorController";
 
-    private static final long RANGING_PERIOD_MINUTES = 1;
-    private static final long READY_TIMEOUT_SECONDS = 2;
+    private static final long RANGING_PERIOD_SECONDS = 15;
+    private static final long READY_TIMEOUT_SECONDS = 10;
     /**
      * Manager awaitMeasurement timeout.
      * 정상 측정은 보통 수십ms~1초 (PoC에서 16ms 확인). fail 학생을 빨리 회수하기 위해 4s로 짧게 잡음.
@@ -252,7 +252,7 @@ public class  ProfessorAttendanceController {
         if (stopped || paused) return;
         if (rangingFuture != null && !rangingFuture.isDone()) return;
         rangingFuture = scheduler.scheduleWithFixedDelay(
-                this::runRangingCycle, 0, RANGING_PERIOD_MINUTES, TimeUnit.MINUTES);
+                this::runRangingCycle, 0, RANGING_PERIOD_SECONDS, TimeUnit.SECONDS);
     }
 
     private void cancelRangingLoop() {

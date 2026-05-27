@@ -7,7 +7,7 @@ const {generateUwbParams} = require('../utils/uwbParamsGenerator');
 // RTDB Attendance_Session/{courseId}/{date} 와 Attendance_Records/{courseId}/{date}/{userId}
 // 를 직접 읽어 UI를 그림. dual-write로 서버가 두 곳 모두 채워줌.
 
-const FIVE_MIN_MS    = 5 * 60 * 1000;
+const FIVE_MIN_MS    = 30 * 1000;
 const TEN_MIN_MS     = 10 * 60 * 1000;
 const FIFTEEN_MIN_MS = 15 * 60 * 1000;
 
@@ -87,7 +87,7 @@ async function syncCycleCountToRtdb({courseId, sessionDate, uwbCheckCount}) {
 }
 
 /** 사이클 감지 임계값. RANGING_PERIOD_MINUTES(1분 테스트/5분 prod) 보다 작아야 함. */
-const CYCLE_GAP_MS = 60 * 1000;
+const CYCLE_GAP_MS = 15 * 1000;
 
 /**
  * UWB 측정 결과 → 그쪽 RTDB UWB_Logs 미러링.

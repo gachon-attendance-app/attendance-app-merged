@@ -192,7 +192,7 @@ public class StudentAttendanceService extends Service {
     private void startForegroundCompat() {
         Notification n = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("출석 진행 중")
-                .setContentText("교수님 신호를 찾고 있습니다")
+                .setContentText("출석 진행 중")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
                 .build();
