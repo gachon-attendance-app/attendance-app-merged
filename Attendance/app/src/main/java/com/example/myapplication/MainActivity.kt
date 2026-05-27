@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.random.Random
 
 class MainActivity : Activity() {
 
@@ -55,7 +54,8 @@ class MainActivity : Activity() {
 
     companion object {
         private const val DEFAULT_SUBJECT_CODE = "14454001"
-        private const val BLUE_ACTIVE = "#015EB6"
+        private const val BLUE_ACTIVE = "#0281F6"
+        private const val GRAY_INACTIVE = "#9E9EA4"
         private const val FIVE_MINUTES = 5 * 60 * 1000L
         private const val TEN_MINUTES = 10 * 60 * 1000L
         private const val FIFTEEN_MINUTES = 15 * 60 * 1000L
@@ -95,7 +95,9 @@ class MainActivity : Activity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         launcher.handlePermissionResult(requestCode, grantResults)
@@ -143,9 +145,14 @@ class MainActivity : Activity() {
         // 학생: BLE 또는 PIN으로 출석 등록 성공
         override fun onAttendanceConfirmed(sessionCode: String?) {
             val pageView = contentFrame.getChildAt(0) ?: return
-            setText(pageView, "tvAttendanceStatus", "출석")
+
+            updateStudentAttendanceUi(
+                pageView = pageView,
+                statusText = "출석 완료",
+                isCompleted = true
+            )
+
             Toast.makeText(this@MainActivity, "출석 처리되었습니다", Toast.LENGTH_SHORT).show()
-            // RTDB 미러링도 다음 refresh에 반영됨 — 즉시 버튼 상태 갱신
             refreshStudentAttendanceButtonState(pageView)
         }
 
@@ -157,7 +164,13 @@ class MainActivity : Activity() {
         // 학생: UWB ranging 3회 연속 실패 → ABSENT
         override fun onAttendanceAbsent(attendanceId: String?) {
             val pageView = contentFrame.getChildAt(0) ?: return
-            setText(pageView, "tvAttendanceStatus", "결석")
+
+            updateStudentAttendanceUi(
+                pageView = pageView,
+                statusText = "결석",
+                isCompleted = false
+            )
+
             AlertDialog.Builder(this@MainActivity)
                 .setTitle("결석 처리")
                 .setMessage("UWB 재실 검증에 3회 연속 실패하여 결석 처리되었습니다.")
@@ -296,7 +309,12 @@ class MainActivity : Activity() {
             if (subjectCode.isNullOrBlank()) {
                 setText(pageView, "tvDate", todayText())
                 setText(pageView, "tvPeriod", "현재 수업 없음")
-                setText(pageView, "tvAttendanceStatus", "출석 전")
+
+                updateStudentAttendanceUi(
+                    pageView = pageView,
+                    statusText = "미출석",
+                    isCompleted = false
+                )
                 return@get
             }
 
@@ -308,7 +326,12 @@ class MainActivity : Activity() {
                 if (subject == null) {
                     setText(pageView, "tvDate", todayText())
                     setText(pageView, "tvPeriod", "수업 정보 없음")
-                    setText(pageView, "tvAttendanceStatus", "출석 전")
+
+                    updateStudentAttendanceUi(
+                        pageView = pageView,
+                        statusText = "미출석",
+                        isCompleted = false
+                    )
                     return@get
                 }
 
@@ -322,7 +345,12 @@ class MainActivity : Activity() {
 
                 setText(pageView, "tvDate", todayText())
                 setText(pageView, "tvPeriod", "1교시")
-                setText(pageView, "tvAttendanceStatus", "미출석")
+
+                updateStudentAttendanceUi(
+                    pageView = pageView,
+                    statusText = "미출석",
+                    isCompleted = false
+                )
             }
         }
     }
@@ -353,15 +381,64 @@ class MainActivity : Activity() {
 
         FirebaseClient.get("Attendance_Records/$currentSubjectCode/$today/$userId") { recordJson ->
             val currentStatus = recordJson?.optString("finalStatus", "") ?: ""
-            if (currentStatus == "출석" || currentStatus == "異쒖꽍" ||
-                currentStatus == "결석" || currentStatus == "寃곗꽍") {
-                setAttendanceButtonInactive(btnAttendance)
-                setText(pageView, "tvAttendanceStatus", currentStatus)
+
+            if (
+                currentStatus == "출석" ||
+                currentStatus == "출석 완료" ||
+                currentStatus == "異쒖꽍"
+            ) {
+                setAttendanceButtonCompleted(btnAttendance)
+
+                updateStudentAttendanceUi(
+                    pageView = pageView,
+                    statusText = "출석 완료",
+                    isCompleted = true
+                )
+
                 btnAttendance.setOnClickListener {
                     Toast.makeText(this, "이미 출석 처리되었습니다", Toast.LENGTH_SHORT).show()
                 }
                 return@get
             }
+
+            if (
+                currentStatus == "결석" ||
+                currentStatus == "寃곗꽍"
+            ) {
+                setAttendanceButtonInactive(btnAttendance)
+
+                updateStudentAttendanceUi(
+                    pageView = pageView,
+                    statusText = "결석",
+                    isCompleted = false
+                )
+
+                btnAttendance.setOnClickListener {
+                    Toast.makeText(this, "결석 처리되었습니다", Toast.LENGTH_SHORT).show()
+                }
+                return@get
+            }
+
+            if (currentStatus == "지각") {
+                setAttendanceButtonInactive(btnAttendance)
+
+                updateStudentAttendanceUi(
+                    pageView = pageView,
+                    statusText = "지각",
+                    isCompleted = false
+                )
+
+                btnAttendance.setOnClickListener {
+                    Toast.makeText(this, "지각 처리되었습니다", Toast.LENGTH_SHORT).show()
+                }
+                return@get
+            }
+
+            updateStudentAttendanceUi(
+                pageView = pageView,
+                statusText = "미출석",
+                isCompleted = false
+            )
 
             refreshStudentAttendanceSessionState(pageView, btnAttendance, today)
         }
@@ -406,12 +483,21 @@ class MainActivity : Activity() {
 
     private fun setAttendanceButtonActive(button: Button) {
         button.setBackgroundResource(R.drawable.bg_attendance_button_blue)
+        button.text = "출석\n체크"
         button.isEnabled = true
         button.alpha = 1.0f
     }
 
     private fun setAttendanceButtonInactive(button: Button) {
         button.setBackgroundResource(R.drawable.bg_attendance_button_gray)
+        button.text = "출석\n체크"
+        button.isEnabled = true
+        button.alpha = 1.0f
+    }
+
+    private fun setAttendanceButtonCompleted(button: Button) {
+        button.setBackgroundResource(R.drawable.bg_attendance_button_gray)
+        button.text = "출석\n완료"
         button.isEnabled = true
         button.alpha = 1.0f
     }
@@ -438,7 +524,7 @@ class MainActivity : Activity() {
         FirebaseClient.get("Attendance_Records/$currentSubjectCode/$today/$userId") { recordJson ->
             val currentStatus = recordJson?.optString("finalStatus", "결석") ?: "결석"
 
-            if (currentStatus == "출석") {
+            if (currentStatus == "출석" || currentStatus == "출석 완료") {
                 Toast.makeText(this, "이미 출석 처리되었습니다", Toast.LENGTH_SHORT).show()
                 return@get
             }
@@ -534,7 +620,12 @@ class MainActivity : Activity() {
             .put("checkedAt", System.currentTimeMillis())
 
         FirebaseClient.put("Attendance_Records/$currentSubjectCode/$today/$userId", body) {
-            setText(pageView, "tvAttendanceStatus", finalStatus)
+            updateStudentAttendanceUi(
+                pageView = pageView,
+                statusText = if (finalStatus == "출석") "출석 완료" else finalStatus,
+                isCompleted = finalStatus == "출석"
+            )
+
             onComplete()
             refreshStudentAttendanceButtonState(pageView)
         }
@@ -805,7 +896,7 @@ class MainActivity : Activity() {
                     total++
 
                     when (status) {
-                        "출석" -> present++
+                        "출석", "출석 완료" -> present++
                         "지각" -> late++
                         "결석" -> absent++
                         "미출석" -> absent++
@@ -858,7 +949,7 @@ class MainActivity : Activity() {
 
         row.addView(
             makeStatusIcon(
-                isVisible = status == "출석",
+                isVisible = status == "출석" || status == "출석 완료",
                 drawableResId = R.drawable.attendanceweek,
                 weight = 0.75f
             )
@@ -1030,7 +1121,7 @@ class MainActivity : Activity() {
                         val date = dateKeys.next()
                         val userRecord = subjectObject.optJSONObject(date)?.optJSONObject(userId) ?: continue
                         when (userRecord.optString("finalStatus", "")) {
-                            "출석" -> present++
+                            "출석", "출석 완료" -> present++
                             "지각" -> late++
                             "결석" -> absent++
                         }
@@ -1104,6 +1195,25 @@ class MainActivity : Activity() {
 
     private fun setText(pageView: View, idName: String, value: String) {
         findChildByIdName<TextView>(pageView, idName)?.text = value
+    }
+
+    private fun updateStudentAttendanceUi(
+        pageView: View,
+        statusText: String,
+        isCompleted: Boolean
+    ) {
+        val ivCheckIcon = pageView.findViewById<ImageView?>(R.id.ivCheckIcon)
+        val tvAttendanceStatus = pageView.findViewById<TextView?>(R.id.tvAttendanceStatus)
+
+        tvAttendanceStatus?.text = statusText
+
+        if (isCompleted) {
+            ivCheckIcon?.setImageResource(R.drawable.mainblue)
+            tvAttendanceStatus?.setTextColor(Color.parseColor(BLUE_ACTIVE))
+        } else {
+            ivCheckIcon?.setImageResource(R.drawable.maingray)
+            tvAttendanceStatus?.setTextColor(Color.parseColor(GRAY_INACTIVE))
+        }
     }
 
     private inline fun <reified T> findChildByIdName(pageView: View, idName: String): T? {
@@ -1232,6 +1342,4 @@ class MainActivity : Activity() {
         startActivity(intent)
         finish()
     }
-
-
 }
