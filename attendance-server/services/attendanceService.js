@@ -7,9 +7,12 @@ const {generateUwbParams} = require('../utils/uwbParamsGenerator');
 // RTDB Attendance_Session/{courseId}/{date} 와 Attendance_Records/{courseId}/{date}/{userId}
 // 를 직접 읽어 UI를 그림. dual-write로 서버가 두 곳 모두 채워줌.
 
+// TEST_ONLY: BLE phase is shortened for device tests. Restore to 5 * 60 * 1000 for normal runs.
 const FIVE_MIN_MS    = 30 * 1000;
 const TEN_MIN_MS     = 10 * 60 * 1000;
 const FIFTEEN_MIN_MS = 15 * 60 * 1000;
+// TEST_ONLY: PIN window is based on attendance start + 1 minute. Restore to classStartAt + FIFTEEN_MIN_MS for normal runs.
+const PIN_WINDOW_MS  = 60 * 1000;
 
 /** KST(UTC+9) 기준 yyyy-MM-dd. 그쪽 클라(SimpleDateFormat KOREA)와 동일 결과. */
 function dateStringKst(epochMs) {
@@ -40,9 +43,11 @@ async function syncRecordToRtdb({courseId, sessionDate, studentId, now, classSta
     const authMethod = inBluetoothPhase ? "BLUETOOTH" : "PIN";
 
     let finalStatus = "출석";
-    if (!inBluetoothPhase && classStartAt > 0 && now > classStartAt + TEN_MIN_MS) {
-        finalStatus = "결석";
-    }
+    // TEST_ONLY: PIN attendance is accepted as present during short device tests.
+    // Restore this condition for normal runs:
+    // if (!inBluetoothPhase && classStartAt > 0 && now > classStartAt + TEN_MIN_MS) {
+    //     finalStatus = "결석";
+    // }
 
     await rtdb.ref(`Attendance_Records/${courseId}/${sessionDate}/${studentId}`).set({
         finalStatus,
@@ -86,7 +91,7 @@ async function syncCycleCountToRtdb({courseId, sessionDate, uwbCheckCount}) {
     });
 }
 
-/** 사이클 감지 임계값. RANGING_PERIOD_MINUTES(1분 테스트/5분 prod) 보다 작아야 함. */
+/** TEST_ONLY: UWB cycle gap is shortened for device tests. Restore to 60 * 1000 or production period threshold later. */
 const CYCLE_GAP_MS = 15 * 1000;
 
 /**
@@ -144,7 +149,7 @@ exports.startAttendanceSession = async ({courseId, professorId, professorUwbAddr
     // classStartAt 없으면 now로 fallback (ad-hoc 세션).
     const safeClassStartAt = (classStartAt && classStartAt > 0) ? classStartAt : nowMs;
     const bluetoothEndAt = nowMs + FIVE_MIN_MS;
-    const pinEndAt = safeClassStartAt + FIFTEEN_MIN_MS;
+    const pinEndAt = nowMs + PIN_WINDOW_MS;
     // sessionDate: 세션 시작 시점 기준 yyyy-MM-dd. 자정 걸쳐도 모든 dual-write가 동일 경로 사용.
     const sessionDate = dateStringKst(nowMs);
 

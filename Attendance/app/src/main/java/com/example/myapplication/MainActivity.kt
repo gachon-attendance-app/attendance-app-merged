@@ -283,7 +283,10 @@ class MainActivity : Activity() {
     private fun setupDrawerMenuClick() {
         findViewById<View?>(R.id.menuMyPage)?.setOnClickListener { moveTo(R.layout.mypage) }
         findViewById<View?>(R.id.menuSchedule)?.setOnClickListener { moveTo(R.layout.schedule_1) }
-        findViewById<View?>(R.id.menuWeekAttendance)?.setOnClickListener { moveTo(R.layout.week_1) }
+        findViewById<View?>(R.id.menuWeekAttendance)?.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.END)
+            startActivity(Intent(this, WeekActivity::class.java))
+        }
         findViewById<View?>(R.id.menuAllAttendance)?.setOnClickListener { moveTo(R.layout.all_attendance) }
         findViewById<View?>(R.id.menuConfirmPeriod)?.setOnClickListener { moveTo(R.layout.confirm_1) }
         findViewById<View?>(R.id.menuConfirmOfficial)?.setOnClickListener { moveTo(R.layout.confirm_2) }
@@ -645,7 +648,9 @@ class MainActivity : Activity() {
         }
         val now = System.currentTimeMillis()
         val classStartAt = todayMillisFromTime(currentClassStartTime)
-        val pinEndAt = classStartAt + FIFTEEN_MINUTES
+        // TEST_ONLY: professor PIN card switches after attendance start + 1 minute.
+        // Restore to classStartAt + FIFTEEN_MINUTES for normal runs.
+        val pinEndAt = now + 60 * 1000L
 
         // 출석 Service 시작 (권한/UWB feature 체크는 launcher 내부에서)
         launcher.startProfessor(currentSubjectCode, userId, classStartAt)
@@ -759,7 +764,7 @@ class MainActivity : Activity() {
         val cardAfter15 = findChildByIdName<View>(pageView, "cardProfessorControlAfter15")
         val cardUwb = findChildByIdName<View>(pageView, "cardUwbMiddleCheck")
         val btnRollCall = findChildByIdName<View>(pageView, "btnRollCallAttendance")
-        val btnProfessorAttendanceCheck = findChildByIdName<Button>(pageView, "btnProfessorAttendanceCheck")
+        val btnProfessorAttendanceCheck = findChildByIdName<View>(pageView, "btnProfessorAttendanceCheck")
 
         if (sessionJson == null) {
             cardBefore15?.visibility = View.VISIBLE
@@ -780,6 +785,8 @@ class MainActivity : Activity() {
         val pinEndAt = sessionJson.optLong("pinEndAt", todayMillisFromTime(currentClassStartTime) + FIFTEEN_MINUTES)
         val status = sessionJson.optString("status", "READY")
         val pinCode = sessionJson.optString("pinCode", "")
+        val uwbCheckCount = sessionJson.optInt("uwbCheckCount", 0)
+        setText(pageView, "tvUwbCheckCount", "${uwbCheckCount}회")
 
         if (now >= pinEndAt || status == "UWB_ACTIVE") {
             cardBefore15?.visibility = View.GONE

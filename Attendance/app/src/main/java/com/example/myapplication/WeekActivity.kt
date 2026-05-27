@@ -11,35 +11,27 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class WeekActivity : ComponentActivity() {
 
     private val expandedMap = mutableMapOf<Int, Boolean>()
 
+    private val testCourseId = "10"
     private val studentId = "202234920"
-    private val selectedDate = "2026-04-28"
-    private val selectedDayOfWeek = "Tuesday"
-
-    private lateinit var rootJson: JSONObject
+    private val selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(Date())
+    private val selectedDayOfWeek = SimpleDateFormat("EEEE", Locale.US).format(Date())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.week_1)
 
-        rootJson = loadJsonFromAssets()
-
         findViewById<TextView>(R.id.tvSelectedDate).text = selectedDate.replace("-", ".")
 
         initClickEvents()
-        loadWeeklyAttendanceFromJson()
-    }
-
-    private fun loadJsonFromAssets(): JSONObject {
-        val jsonText = assets.open("attendanceapp-cbf00-default-rtdb-export (2).json")
-            .bufferedReader()
-            .use { it.readText() }
-
-        return JSONObject(jsonText)
+        loadTestAttendanceFromRtdb()
     }
 
     private fun initClickEvents() {
@@ -84,43 +76,30 @@ class WeekActivity : ComponentActivity() {
         }
     }
 
-    private fun loadWeeklyAttendanceFromJson() {
+    private fun loadTestAttendanceFromRtdb() {
         hideAllItems()
 
-        val enrollmentObject = rootJson
-            .optJSONObject("Enrollment")
-            ?.optJSONObject(studentId)
-
-        if (enrollmentObject == null) {
-            return
-        }
-
-        val subjectCodes = mutableListOf<String>()
-        val keys = enrollmentObject.keys()
-
-        while (keys.hasNext()) {
-            subjectCodes.add(keys.next())
-        }
-
-        subjectCodes.take(5).forEachIndexed { position, subjectCode ->
-            val index = position + 1
-            val item = makeAttendanceItem(subjectCode)
-
-            bindBasicAttendanceItem(index, item)
-            renderDetailRows(index, item.uwbRows)
+        FirebaseClient.get("Subjects/$testCourseId") { subjectJson ->
+            FirebaseClient.get("Attendance_Records/$testCourseId/$selectedDate/$studentId") { recordJson ->
+                FirebaseClient.get("UWB_Logs/$testCourseId/$selectedDate/$studentId") { uwbJson ->
+                    val item = makeAttendanceItem(testCourseId, subjectJson, recordJson, uwbJson)
+                    bindBasicAttendanceItem(1, item)
+                    renderDetailRows(1, item.uwbRows)
+                }
+            }
         }
     }
 
-    private fun makeAttendanceItem(subjectCode: String): AttendanceItem {
-        val subjectObject = rootJson
-            .optJSONObject("Subjects")
-            ?.optJSONObject(subjectCode)
-
-        val originalSubjectName = subjectObject
-            ?.optString("subjectName", "")
-            ?: ""
-
-        val subjectName = cleanSubjectName(originalSubjectName)
+    private fun makeAttendanceItem(
+        subjectCode: String,
+        subjectObject: JSONObject?,
+        attendanceObject: JSONObject?,
+        uwbObject: JSONObject?
+    ): AttendanceItem {
+        val originalSubjectName = subjectObject?.optString("subjectName", "").orEmpty()
+        val subjectName = cleanSubjectName(originalSubjectName).ifBlank {
+            "테스트 수업 $subjectCode"
+        }
 
         val classTimes = if (subjectObject != null) {
             getClassTimesForSelectedDay(subjectObject)
@@ -128,24 +107,14 @@ class WeekActivity : ComponentActivity() {
             emptyList()
         }
 
-        val attendanceObject = rootJson
-            .optJSONObject("Attendance_Records")
-            ?.optJSONObject(subjectCode)
-            ?.optJSONObject(selectedDate)
-            ?.optJSONObject(studentId)
-
-        val finalStatus = attendanceObject
-            ?.optString("finalStatus", "")
-            ?: ""
-
-        val uwbRows = getUwbRows(subjectCode)
+        val finalStatus = attendanceObject?.optString("finalStatus", "").orEmpty()
 
         return AttendanceItem(
             subjectCode = subjectCode,
             subjectName = subjectName,
             classTimes = classTimes,
             finalStatus = finalStatus,
-            uwbRows = uwbRows
+            uwbRows = getUwbRows(uwbObject)
         )
     }
 
@@ -156,20 +125,12 @@ class WeekActivity : ComponentActivity() {
         val dayKeys = scheduleObject.keys()
 
         while (dayKeys.hasNext()) {
-            val dayKey = dayKeys.next()
-            val dayObject = scheduleObject.optJSONObject(dayKey) ?: continue
-
-            val dayOfWeek = dayObject.optString("dayOfWeek", "")
-
-            if (dayOfWeek != selectedDayOfWeek) {
-                continue
-            }
+            val dayObject = scheduleObject.optJSONObject(dayKeys.next()) ?: continue
+            if (dayObject.optString("dayOfWeek", "") != selectedDayOfWeek) continue
 
             val periodsArray = dayObject.optJSONArray("periods") ?: continue
-
             for (i in 0 until periodsArray.length()) {
                 val periodObject = periodsArray.optJSONObject(i) ?: continue
-
                 val startTime = periodObject.optString("startTime", "")
                 val endTime = periodObject.optString("endTime", "")
 
@@ -182,19 +143,10 @@ class WeekActivity : ComponentActivity() {
         return result
     }
 
-    private fun getUwbRows(subjectCode: String): List<UwbCheckRow> {
+    private fun getUwbRows(uwbObject: JSONObject?): List<UwbCheckRow> {
+        if (uwbObject == null) return emptyList()
+
         val rows = mutableListOf<UwbCheckRow>()
-
-        val uwbObject = rootJson
-            .optJSONObject("UWB_Logs")
-            ?.optJSONObject(subjectCode)
-            ?.optJSONObject(selectedDate)
-            ?.optJSONObject(studentId)
-
-        if (uwbObject == null) {
-            return emptyList()
-        }
-
         val timeKeys = uwbObject.keys()
 
         while (timeKeys.hasNext()) {
@@ -202,53 +154,47 @@ class WeekActivity : ComponentActivity() {
             val logObject = uwbObject.optJSONObject(timeKey) ?: continue
 
             val timestamp = logObject.optString("timestamp", "")
-            val displayTime = if (timestamp.isNotBlank()) {
-                timestamp
-            } else {
-                timeKey.replace("_", ":")
-            }
+            val displayTime = timestamp.ifBlank { timeKey.replace("_", ":") }
 
-            val detected: Boolean? = when {
+            val detected = when {
                 logObject.has("detected") -> logObject.optBoolean("detected")
                 logObject.has("isDetected") -> logObject.optBoolean("isDetected")
                 else -> null
             }
 
-            val status = when (detected) {
-                true -> "출석"
-                false -> "미출석"
-                null -> ""
-            }
-
             rows.add(
                 UwbCheckRow(
                     time = displayTime,
-                    status = status
+                    status = when (detected) {
+                        true -> "출석"
+                        false -> "미인증"
+                        null -> ""
+                    }
                 )
             )
         }
 
-        return rows
+        return rows.sortedBy { it.time }
     }
 
     private fun bindBasicAttendanceItem(index: Int, item: AttendanceItem) {
         val itemLayout = findViewById<LinearLayout>(getItemId(index))
         itemLayout.visibility = View.VISIBLE
 
-        val titleTextView = findTitleTextView(itemLayout)
-        val timeTextView = findTimeTextView(itemLayout)
-        val statusTextView = findStatusTextView(itemLayout)
-        val statusIconView = findStatusIconView(itemLayout)
+        val textViews = collectTextViews(itemLayout)
+        val titleTextView = textViews.getOrNull(0)
+        val timeTextView = textViews.getOrNull(1)
+        val statusTextView = textViews.getOrNull(2)
+        val statusIconView = findLastImageView(itemLayout)
 
         titleTextView?.text = item.subjectName
-
         timeTextView?.text = if (item.classTimes.isNotEmpty()) {
-            "◷ ${item.classTimes.first()}"
+            item.classTimes.first()
         } else {
-            "◷ "
+            selectedDate
         }
 
-        when (item.finalStatus) {
+        when (normalizeStatus(item.finalStatus)) {
             "출석" -> {
                 statusTextView?.text = "출석"
                 statusTextView?.setTextColor(Color.parseColor("#004B83"))
@@ -261,14 +207,16 @@ class WeekActivity : ComponentActivity() {
                 statusIconView?.setImageResource(R.drawable.lateweek)
             }
 
-            "결석", "ABSENT" -> {
+            "결석" -> {
                 statusTextView?.text = "결석"
                 statusTextView?.setTextColor(Color.parseColor("#D60000"))
                 statusIconView?.setImageResource(R.drawable.absentweek)
             }
 
             else -> {
-                statusTextView?.text = ""
+                statusTextView?.text = "미출석"
+                statusTextView?.setTextColor(Color.parseColor("#777777"))
+                statusIconView?.setImageResource(R.drawable.absentweek)
             }
         }
     }
@@ -277,7 +225,13 @@ class WeekActivity : ComponentActivity() {
         val container = findViewById<LinearLayout>(getDetailRowsContainerId(index))
         container.removeAllViews()
 
-        for (row in rows) {
+        val displayRows = if (rows.isEmpty()) {
+            listOf(UwbCheckRow("UWB 기록 없음", ""))
+        } else {
+            rows
+        }
+
+        for (row in displayRows) {
             val rowLayout = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -328,72 +282,32 @@ class WeekActivity : ComponentActivity() {
             .trim()
     }
 
-    private fun findTitleTextView(parent: LinearLayout): TextView? {
-        return findTextViewByTextColor(parent, "#004B83")
+    private fun normalizeStatus(status: String): String {
+        return when (status) {
+            "출석", "출석 완료", "異쒖꽍" -> "출석"
+            "지각", "吏媛?" -> "지각"
+            "결석", "寃곗꽍", "ABSENT" -> "결석"
+            else -> ""
+        }
     }
 
-    private fun findTimeTextView(parent: LinearLayout): TextView? {
-        return findTextViewContains(parent, "◷")
+    private fun collectTextViews(view: View): List<TextView> {
+        val result = mutableListOf<TextView>()
+        collectTextViewsInto(view, result)
+        return result
     }
 
-    private fun findStatusTextView(parent: LinearLayout): TextView? {
-        return findTextViewByStatus(parent)
-    }
-
-    private fun findStatusIconView(parent: LinearLayout): ImageView? {
-        return findLastImageView(parent)
-    }
-
-    private fun findTextViewByTextColor(view: View, colorHex: String): TextView? {
+    private fun collectTextViewsInto(view: View, result: MutableList<TextView>) {
         if (view is TextView) {
-            if (view.currentTextColor == Color.parseColor(colorHex)) {
-                return view
-            }
+            result.add(view)
+            return
         }
 
         if (view is LinearLayout) {
             for (i in 0 until view.childCount) {
-                val result = findTextViewByTextColor(view.getChildAt(i), colorHex)
-                if (result != null) return result
+                collectTextViewsInto(view.getChildAt(i), result)
             }
         }
-
-        return null
-    }
-
-    private fun findTextViewContains(view: View, keyword: String): TextView? {
-        if (view is TextView) {
-            if (view.text.toString().contains(keyword)) {
-                return view
-            }
-        }
-
-        if (view is LinearLayout) {
-            for (i in 0 until view.childCount) {
-                val result = findTextViewContains(view.getChildAt(i), keyword)
-                if (result != null) return result
-            }
-        }
-
-        return null
-    }
-
-    private fun findTextViewByStatus(view: View): TextView? {
-        if (view is TextView) {
-            val text = view.text.toString()
-            if (text == "출석" || text == "지각" || text == "결석") {
-                return view
-            }
-        }
-
-        if (view is LinearLayout) {
-            for (i in 0 until view.childCount) {
-                val result = findTextViewByStatus(view.getChildAt(i))
-                if (result != null) return result
-            }
-        }
-
-        return null
     }
 
     private fun findLastImageView(view: View): ImageView? {

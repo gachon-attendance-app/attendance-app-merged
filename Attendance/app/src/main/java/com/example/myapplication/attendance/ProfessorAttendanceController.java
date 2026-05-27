@@ -53,6 +53,7 @@ public class  ProfessorAttendanceController {
 
     private static final String TAG = "ProfessorController";
 
+    // TEST_ONLY: UWB ranging period is shortened for device tests. Restore to minute-based production period later.
     private static final long RANGING_PERIOD_SECONDS = 15;
     private static final long READY_TIMEOUT_SECONDS = 10;
     /**

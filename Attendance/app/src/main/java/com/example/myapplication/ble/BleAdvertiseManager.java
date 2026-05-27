@@ -31,7 +31,8 @@ public class BleAdvertiseManager {
 
     private static final String TAG = "BleAdvertise";
     private static final String UUID_STR = "12345678-1234-1234-1234-1234567890ab";
-    private static final long DEFAULT_DURATION_MS = 1 * 30_000; // 5분
+    // TEST_ONLY: BLE advertising is shortened for device tests. Restore to 5 * 60_000L for normal runs.
+    private static final long DEFAULT_DURATION_MS = 1 * 30_000;
 
     private final Context context;
     private BluetoothAdapter adapter;
