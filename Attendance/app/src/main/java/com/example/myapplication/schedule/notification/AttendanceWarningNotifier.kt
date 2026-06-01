@@ -73,6 +73,40 @@ object AttendanceWarningNotifier {
         nm?.notify(NOTIFICATION_ID_ABSENT, notification)
     }
 
+    /**
+     * UWB 연결 실패(하드웨어 스위치 꺼짐 등) 시 즉각 통보.
+     */
+    @JvmStatic
+    fun notifyUwbFailed(context: Context) {
+        ensureChannel(context)
+
+        val tapIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val tapPi = PendingIntent.getActivity(
+            context,
+            9003, // REQUEST_CODE for UWB fail
+            tapIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setContentTitle("UWB 기능 확인 필요")
+            .setContentText("스마트폰 설정에서 UWB 기능이 켜져 있는지 확인하고 다시 시도해주세요.")
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setAutoCancel(true)
+            .setOngoing(false)
+            .setContentIntent(tapPi)
+            .build()
+
+        val nm = context.getSystemService(NotificationManager::class.java)
+        nm?.notify(1004, notification)
+    }
+
     private fun ensureChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val nm = context.getSystemService(NotificationManager::class.java) ?: return

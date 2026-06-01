@@ -12,6 +12,7 @@ import com.example.myapplication.network.CheckInRequest;
 import com.example.myapplication.network.RetrofitClient;
 import com.example.myapplication.network.UwbParamsAdapter;
 import com.example.myapplication.network.socket.AttendanceSocketClient;
+import com.example.myapplication.schedule.notification.AttendanceWarningNotifier;
 import com.example.myapplication.uwb.StudentUwbRangingManager;
 
 import retrofit2.Call;
@@ -47,6 +48,7 @@ public class AttendanceController {
     private final StudentUwbRangingManager uwbManager;
     private final AttendanceSocketClient socketClient;
     private final String studentId;
+    private final Context context;
 
     private OnAttendanceListener listener;
 
@@ -59,6 +61,7 @@ public class AttendanceController {
         this.uwbManager = new StudentUwbRangingManager(context);
         this.socketClient = new AttendanceSocketClient(AttendanceSocketClient.Role.STUDENT);
         this.studentId = studentId;
+        this.context = context.getApplicationContext();
 
         this.scanManager.setListener(new BleScanManager.OnScanListener() {
             @Override
@@ -197,7 +200,8 @@ public class AttendanceController {
             @Override
             public void onScopeFailed(String reason) {
                 Log.e(TAG, "openScope 실패: " + reason);
-                // READY 안 보냄 → 교수 측 timeout으로 처리됨
+                AttendanceWarningNotifier.notifyUwbFailed(context);
+                notifyFailed("UWB 연결 실패 (기기의 UWB 설정 확인 요망)");
             }
         });
     }

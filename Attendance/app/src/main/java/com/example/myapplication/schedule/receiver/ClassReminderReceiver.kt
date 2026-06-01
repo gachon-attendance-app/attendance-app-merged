@@ -47,6 +47,31 @@ class ClassReminderReceiver : BroadcastReceiver() {
         ensureChannel(context)
         postNotification(context, subjectId, subjectName, startTime, location)
 
+        // ── 자동 출석 시작 (신규 추가) ─────────────────────────
+        val loginPref = context.getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE)
+        val userId = loginPref.getString("userId", "") ?: ""
+        val userRole = loginPref.getString("userRole", "") ?: ""
+
+        if (userId.isNotBlank()) {
+            if (userRole == "student") {
+                val serviceIntent = Intent(context, com.example.myapplication.service.StudentAttendanceService::class.java).apply {
+                    action = com.example.myapplication.service.StudentAttendanceService.ACTION_START
+                    putExtra(com.example.myapplication.service.StudentAttendanceService.EXTRA_STUDENT_ID, userId)
+                }
+                androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
+                Log.d(TAG, "자동 출석 시작: 학생($userId)")
+            } else if (userRole == "professor") {
+                val serviceIntent = Intent(context, com.example.myapplication.service.ProfessorAttendanceService::class.java).apply {
+                    action = com.example.myapplication.service.ProfessorAttendanceService.ACTION_START
+                    putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_COURSE_ID, subjectId)
+                    putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_PROFESSOR_ID, userId)
+                    putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_CLASS_START_AT, 0L)
+                }
+                androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
+                Log.d(TAG, "자동 출석 시작: 교수($userId, $subjectId)")
+            }
+        }
+
         // 3) 다음 주 재예약 — DB에 schedule 여전히 있을 때만
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
