@@ -65,8 +65,6 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
 
         readLoginInfo()
-
-
         if (userId.isNotBlank()) {
             com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueueOnce(this, userId)
             com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueuePeriodic(this, userId)
