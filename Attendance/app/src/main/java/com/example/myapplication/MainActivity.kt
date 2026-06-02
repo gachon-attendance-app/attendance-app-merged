@@ -66,15 +66,11 @@ class MainActivity : Activity() {
 
         readLoginInfo()
 
-<<<<<<< HEAD
+
         if (userId.isNotBlank()) {
             com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueueOnce(this, userId)
             com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueuePeriodic(this, userId)
         }
-=======
-        com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueueOnce(this, userId)
-        com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueuePeriodic(this, userId)
->>>>>>> 67b0387 (Update startup permissions and schedule course id)
 
         setContentView(R.layout.activity_drawer_host)
 
