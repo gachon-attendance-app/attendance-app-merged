@@ -100,10 +100,16 @@ class RtdbScheduleSyncManager(
      */
     private fun parseSubject(snap: DataSnapshot): List<ScheduleEntity> {
         if (!snap.exists()) return emptyList()
-
+        /*
         val subjectCode = snap.child("subjectCode").getValue(String::class.java)
             ?: snap.key
             ?: return emptyList()
+         */
+
+        val subjectCode = snap.key
+            ?: snap.child("subjectCode").getValue(String::class.java)
+            ?: return emptyList()
+
         val subjectName = snap.child("subjectName").getValue(String::class.java) ?: subjectCode
 
         val scheduleNode = snap.child("schedule")

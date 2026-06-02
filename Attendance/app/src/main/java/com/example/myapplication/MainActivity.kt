@@ -66,6 +66,11 @@ class MainActivity : Activity() {
 
         readLoginInfo()
 
+        if (userId.isNotBlank()) {
+            com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueueOnce(this, userId)
+            com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueuePeriodic(this, userId)
+        }
+
         setContentView(R.layout.activity_drawer_host)
 
         drawerLayout = findViewById(R.id.drawerLayout)
