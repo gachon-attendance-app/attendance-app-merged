@@ -12,7 +12,11 @@ public final class NetworkConfig {
     private NetworkConfig() {}
 
     // 변경 시 여기 한 줄만 (다른 두 상수는 자동 파생)
+<<<<<<< HEAD
     private static final String HOST = "http://172.30.1.50:3000";
+=======
+    private static final String HOST = "http://172.30.1.94:3000";
+>>>>>>> 67b0387 (Update startup permissions and schedule course id)
 
     /** Retrofit/OkHttp용. 끝 슬래시 포함. */
     public static final String HTTP_BASE_URL = HOST + "/";

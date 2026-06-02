@@ -66,10 +66,15 @@ class MainActivity : Activity() {
 
         readLoginInfo()
 
+<<<<<<< HEAD
         if (userId.isNotBlank()) {
             com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueueOnce(this, userId)
             com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueuePeriodic(this, userId)
         }
+=======
+        com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueueOnce(this, userId)
+        com.example.myapplication.schedule.work.ScheduleSyncWorker.enqueuePeriodic(this, userId)
+>>>>>>> 67b0387 (Update startup permissions and schedule course id)
 
         setContentView(R.layout.activity_drawer_host)
 
@@ -79,6 +84,7 @@ class MainActivity : Activity() {
         // 출석 Service 통합 헬퍼 — 권한/Service trigger/broadcast 수신 캡슐화
         launcher = AttendanceServiceLauncher(this)
         launcher.setListener(sessionListener)
+        launcher.requestStartupPermissions()
 
         if (userRole == "professor") {
             loadPage(R.layout.main_p_1)

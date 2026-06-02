@@ -68,6 +68,9 @@ public class AttendanceServiceLauncher {
     private String pendingProfessorId;
     private long pendingClassStartAt;
 
+    /** App-start permission warmup. Alarm-triggered services cannot show permission dialogs. */
+    private boolean startupPermissionFlow;
+
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context ctx, Intent i) {
@@ -103,7 +106,37 @@ public class AttendanceServiceLauncher {
 
     public AttendanceServiceLauncher(Activity activity) {
         this.activity = activity;
-        requestNotificationPermissionIfNeeded();
+
+    }
+
+    public void requestStartupPermissions() {
+        startupPermissionFlow = true;
+        requestNextStartupPermission();
+    }
+
+    private void requestNextStartupPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && !granted(Manifest.permission.POST_NOTIFICATIONS)) {
+            activity.requestPermissions(
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQ_NOTIFICATION_PERMS);
+            return;
+        }
+
+        if (!hasBlePerms()) {
+            requestBlePerms();
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && !granted(Manifest.permission.UWB_RANGING)) {
+            activity.requestPermissions(
+                    new String[]{Manifest.permission.UWB_RANGING},
+                    REQ_UWB_PERMS);
+            return;
+        }
+
+        startupPermissionFlow = false;
     }
 
     public void setListener(SessionEventsListener listener) {
@@ -138,24 +171,38 @@ public class AttendanceServiceLauncher {
     public void handlePermissionResult(int requestCode, int[] grantResults) {
         if (requestCode == REQ_BLE_PERMS) {
             if (allGranted(grantResults)) {
-                Log.d(TAG, "BLE 권한 승인 → 재개");
+                Log.d(TAG, "BLE permission granted");
+                if (startupPermissionFlow) {
+                    requestNextStartupPermission();
+                    return;
+                }
                 resumePending();
             } else {
-                Log.e(TAG, "BLE 권한 거부");
+                startupPermissionFlow = false;
+                Log.e(TAG, "BLE permission denied");
                 clearPending();
                 Toast.makeText(activity, "BLE 권한이 필요합니다", Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == REQ_UWB_PERMS) {
             if (allGranted(grantResults)) {
-                Log.d(TAG, "UWB 권한 승인 → 재개");
+                Log.d(TAG, "UWB permission granted");
+                if (startupPermissionFlow) {
+                    requestNextStartupPermission();
+                    return;
+                }
                 resumePending();
             } else {
-                Log.e(TAG, "UWB 권한 거부");
+                startupPermissionFlow = false;
+                Log.e(TAG, "UWB permission denied");
                 clearPending();
                 Toast.makeText(activity, "UWB 권한이 필요합니다", Toast.LENGTH_SHORT).show();
             }
         }
-        // REQ_NOTIFICATION_PERMS: 결과 무시 (거부돼도 Service 동작은 가능)
+        else if (requestCode == REQ_NOTIFICATION_PERMS) {
+            if (startupPermissionFlow) {
+                requestNextStartupPermission();
+            }
+        }
     }
 
     // ── 공개 API: 학생/교수/PIN/STOP ──────────────────────────
