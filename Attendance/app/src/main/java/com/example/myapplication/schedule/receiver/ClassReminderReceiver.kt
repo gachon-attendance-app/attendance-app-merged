@@ -43,33 +43,37 @@ class ClassReminderReceiver : BroadcastReceiver() {
 
         Log.d(TAG, "알람 발화: $subjectName ($dayOfWeek $startTime)")
 
-        // 1) 채널 보장 + 2) 알림 발사
-        ensureChannel(context)
-        postNotification(context, subjectId, subjectName, startTime, location)
+        val isAutoStart = intent.getBooleanExtra(EXTRA_IS_AUTO_START, false)
 
-        // ── 자동 출석 시작 (신규 추가) ─────────────────────────
-        val loginPref = context.getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE)
-        val userId = loginPref.getString("userId", "") ?: ""
-        val userRole = loginPref.getString("userRole", "") ?: ""
+        if (isAutoStart) {
+            // ── 자동 출석 시작 (정각) ─────────────────────────
+            val loginPref = context.getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE)
+            val userId = loginPref.getString("userId", "") ?: ""
+            val userRole = loginPref.getString("userRole", "") ?: ""
 
-        if (userId.isNotBlank()) {
-            if (userRole == "student") {
-                val serviceIntent = Intent(context, com.example.myapplication.service.StudentAttendanceService::class.java).apply {
-                    action = com.example.myapplication.service.StudentAttendanceService.ACTION_START
-                    putExtra(com.example.myapplication.service.StudentAttendanceService.EXTRA_STUDENT_ID, userId)
+            if (userId.isNotBlank()) {
+                if (userRole == "student") {
+                    val serviceIntent = Intent(context, com.example.myapplication.service.StudentAttendanceService::class.java).apply {
+                        action = com.example.myapplication.service.StudentAttendanceService.ACTION_START
+                        putExtra(com.example.myapplication.service.StudentAttendanceService.EXTRA_STUDENT_ID, userId)
+                    }
+                    androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
+                    Log.d(TAG, "자동 출석 시작: 학생($userId)")
+                } else if (userRole == "professor") {
+                    val serviceIntent = Intent(context, com.example.myapplication.service.ProfessorAttendanceService::class.java).apply {
+                        action = com.example.myapplication.service.ProfessorAttendanceService.ACTION_START
+                        putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_COURSE_ID, subjectId)
+                        putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_PROFESSOR_ID, userId)
+                        putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_CLASS_START_AT, 0L)
+                    }
+                    androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
+                    Log.d(TAG, "자동 출석 시작: 교수($userId, $subjectId)")
                 }
-                androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
-                Log.d(TAG, "자동 출석 시작: 학생($userId)")
-            } else if (userRole == "professor") {
-                val serviceIntent = Intent(context, com.example.myapplication.service.ProfessorAttendanceService::class.java).apply {
-                    action = com.example.myapplication.service.ProfessorAttendanceService.ACTION_START
-                    putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_COURSE_ID, subjectId)
-                    putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_PROFESSOR_ID, userId)
-                    putExtra(com.example.myapplication.service.ProfessorAttendanceService.EXTRA_CLASS_START_AT, 0L)
-                }
-                androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
-                Log.d(TAG, "자동 출석 시작: 교수($userId, $subjectId)")
             }
+        } else {
+            // 1) 채널 보장 + 2) 알림 발사 (5분 전)
+            ensureChannel(context)
+            postNotification(context, subjectId, subjectName, startTime, location)
         }
 
         // 3) 다음 주 재예약 — DB에 schedule 여전히 있을 때만
@@ -181,5 +185,6 @@ class ClassReminderReceiver : BroadcastReceiver() {
         const val EXTRA_START_TIME = "startTime"
         const val EXTRA_END_TIME = "endTime"
         const val EXTRA_LOCATION = "location"
+        const val EXTRA_IS_AUTO_START = "isAutoStart"
     }
 }

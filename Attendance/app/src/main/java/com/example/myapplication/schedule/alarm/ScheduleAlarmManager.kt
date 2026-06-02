@@ -35,30 +35,45 @@ class ScheduleAlarmManager(private val context: Context) {
     fun rescheduleAll(schedules: List<ScheduleEntity>) {
         cancelAll()
         schedules.forEach { schedule(it) }
-        persistRequestCodes(schedules.map { it.alarmRequestCode() })
-        Log.d(TAG, "rescheduleAll: ${schedules.size}개 알람 등록")
+        val codes = mutableListOf<Int>()
+        schedules.forEach {
+            codes.add(it.alarmRequestCode(isAutoStart = false))
+            codes.add(it.alarmRequestCode(isAutoStart = true))
+        }
+        persistRequestCodes(codes)
+        Log.d(TAG, "rescheduleAll: ${schedules.size * 2}개 알람 등록")
     }
 
-    /** 한 schedule을 시작 시각의 5분 전으로 예약. */
+    /** 한 schedule을 시작 시각의 5분 전(알림용)과 정각(출석 시작용)으로 각각 예약. */
     fun schedule(schedule: ScheduleEntity) {
-        val triggerMillis = TimeUtils.nextOccurrenceMillis(
+        val reminderMillis = TimeUtils.nextOccurrenceMillis(
             schedule.dayOfWeek,
             schedule.startTime,
             offsetMinutes = -REMINDER_OFFSET_MINUTES
         )
-        val pi = buildPendingIntent(schedule)
+        val startMillis = TimeUtils.nextOccurrenceMillis(
+            schedule.dayOfWeek,
+            schedule.startTime,
+            offsetMinutes = 0
+        )
+        
+        val reminderPi = buildPendingIntent(schedule, isAutoStart = false)
+        val startPi = buildPendingIntent(schedule, isAutoStart = true)
+        
         val am = context.getSystemService(AlarmManager::class.java) ?: return
 
         val canExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
                 || am.canScheduleExactAlarms()
 
         if (canExact) {
-            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerMillis, pi)
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminderMillis, reminderPi)
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, startPi)
         } else {
             Log.w(TAG, "exact alarm 권한 없음 — inexact set()으로 fallback")
-            am.set(AlarmManager.RTC_WAKEUP, triggerMillis, pi)
+            am.set(AlarmManager.RTC_WAKEUP, reminderMillis, reminderPi)
+            am.set(AlarmManager.RTC_WAKEUP, startMillis, startPi)
         }
-        Log.d(TAG, "schedule: ${schedule.subjectName} (${schedule.dayOfWeek} ${schedule.startTime}) → trigger=$triggerMillis")
+        Log.d(TAG, "schedule: ${schedule.subjectName} reminder=$reminderMillis, start=$startMillis")
     }
 
     /** 이전에 등록된 모든 알람 취소. SharedPreferences에 저장된 request code 사용. */
@@ -84,7 +99,7 @@ class ScheduleAlarmManager(private val context: Context) {
 
     // ── PendingIntent 빌드 ────────────────────────────────────
 
-    private fun buildPendingIntent(schedule: ScheduleEntity): PendingIntent {
+    private fun buildPendingIntent(schedule: ScheduleEntity, isAutoStart: Boolean): PendingIntent {
         val intent = Intent(context, ClassReminderReceiver::class.java).apply {
             putExtra(ClassReminderReceiver.EXTRA_SUBJECT_ID, schedule.subjectId)
             putExtra(ClassReminderReceiver.EXTRA_SUBJECT_NAME, schedule.subjectName)
@@ -92,10 +107,11 @@ class ScheduleAlarmManager(private val context: Context) {
             putExtra(ClassReminderReceiver.EXTRA_START_TIME, schedule.startTime)
             putExtra(ClassReminderReceiver.EXTRA_END_TIME, schedule.endTime)
             putExtra(ClassReminderReceiver.EXTRA_LOCATION, schedule.location)
+            putExtra(ClassReminderReceiver.EXTRA_IS_AUTO_START, isAutoStart)
         }
         return PendingIntent.getBroadcast(
             context,
-            schedule.alarmRequestCode(),
+            schedule.alarmRequestCode(isAutoStart),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -130,5 +146,7 @@ class ScheduleAlarmManager(private val context: Context) {
 }
 
 /** ScheduleEntity → 안정적 alarm request code 매핑. */
-internal fun ScheduleEntity.alarmRequestCode(): Int =
-    "$subjectId|$dayOfWeek|$startTime".hashCode()
+internal fun ScheduleEntity.alarmRequestCode(isAutoStart: Boolean): Int {
+    val suffix = if (isAutoStart) "START" else "REMINDER"
+    return "$subjectId|$dayOfWeek|$startTime|$suffix".hashCode()
+}
